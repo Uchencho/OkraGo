@@ -7,12 +7,12 @@ import (
 )
 
 func main() {
-	u := toy.Toy{
-		Name:   "Uchenna Alozie",
-		Weight: 50,
-	}
-	fmt.Println("Before calling New function:\t", u)
-	toy.New(&u)
+	u := toy.New("Uchenna", 50)
+	u.UpdateOnHand(30)
+	u.UpdateSold(10)
 
-	fmt.Println("After calling New function:\t", u)
+	fmt.Println(u.Name)
+	fmt.Println(u.Weight)
+	fmt.Println(u.Hand())
+	fmt.Println(u.Sold())
 }
