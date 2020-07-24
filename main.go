@@ -1,18 +1,16 @@
 package main
 
 import (
+	// "github.com/Uchencho/okraGo/toy"
 	"fmt"
 
-	"github.com/Uchencho/okraGo/toy"
+	"github.com/Uchencho/okraGo/auth"
 )
 
 func main() {
-	u := toy.New("Uchenna", 50)
-	u.UpdateOnHand(30)
-	u.UpdateSold(10)
 
-	fmt.Println(u.Name)
-	fmt.Println(u.Weight)
-	fmt.Println(u.Hand())
-	fmt.Println(u.Sold())
+	// How the package will be consumed
+	uc := auth.New("token", "https://baseurl/")
+	uc.RetrieveAuth()
+	fmt.Println(uc)
 }
