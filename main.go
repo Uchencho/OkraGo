@@ -12,6 +12,6 @@ func main() {
 
 	token := os.Getenv("OKRA_TOKEN")
 	uc := auth.New(token, "https://api.okra.ng/sandbox/v1/")
-	code, body, _ := uc.RetrieveAuth()
-	fmt.Println(code, len(body))
+	body, err := uc.RetrieveAuth()
+	fmt.Println(err, len(body), body[:50])
 }

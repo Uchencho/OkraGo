@@ -3,8 +3,8 @@ package auth
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -26,107 +26,118 @@ func New(t string, b string) Initializer {
 	return u
 }
 
-func postRequest(req *http.Request) (scode int, body string, err error) {
+func postRequest(url string, reqBody []byte, token string) (body string, err error) {
+	var bearer = "Bearer " + token
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return "Error", fmt.Errorf("error making http call: %w", err)
+	}
+	req.Header.Add("Authorization", bearer)
+
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatalln(err)
+		return "Error", fmt.Errorf("error doing request: %w", err)
 	}
 
 	defer resp.Body.Close()
 
 	bod, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err)
+		return "Error", fmt.Errorf("error reading body: %w", err)
 	}
-	scode = resp.StatusCode
-	body = string(bod)
+	if resp.StatusCode != 200 {
+		body = "Status code returned was: " + string(resp.StatusCode)
+	} else {
+		body = string(bod)
+	}
+
 	return
 }
 
 // RetrieveAuth retrieves authentication of a user
-func (w Initializer) RetrieveAuth() (sCode int, body string, err error) {
-	var bearer = "Bearer " + w.token
-	const url = "products/auths"
-	endpoint := w.baseurl + url
-	req, err := http.NewRequest("POST", endpoint, nil)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	req.Header.Add("Authorization", bearer)
+func (w Initializer) RetrieveAuth() (body string, err error) {
 
-	sCode, body, err = postRequest(req)
+	endpoint := w.baseurl + "products/auths"
+
+	body, err = postRequest(endpoint, nil, w.token)
 	if err != nil {
-		log.Fatalln(err)
+		return "Error", fmt.Errorf("error retrieving auth token: %w", err)
 	}
 	return
 
 }
 
 // ByID fetch authentication info using the id of the authentication record.
-func (w Initializer) ByID(i string) (scode int, body string, err error) {
+func (w Initializer) ByID(i string) (body string, err error) {
 
 	reqBody, err := json.Marshal(map[string]string{
 		"id": i,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		return "Error", fmt.Errorf("error converting json: %w", err)
 	}
 
-	var bearer = "Bearer " + w.token
 	endpoint := w.baseurl + "auth/getById"
-	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(reqBody))
-	req.Header.Add("Authorization", bearer)
 
-	scode, body, err = postRequest(req)
+	body, err = postRequest(endpoint, reqBody, w.token)
 	if err != nil {
-		log.Fatalln(err)
+		return "Error", fmt.Errorf("error fetching auth using id: %w", err)
 	}
 	return
 }
 
 // ByOptions fetch authentication info using the options metadata you provided when setting up the widget.
-func (w Initializer) ByOptions(page string, limit string, firstname string, lastname string) (scode int, body string, err error) {
+func (w Initializer) ByOptions(page string, limit string, firstname string, lastname string) (body string, err error) {
 
-	reqBody, err := json.Marshal(map[string]string{
-		"page":  page,
-		"limit": limit,
-		// "options": {"first_name": firstname, "last_name": lastname},
-	})
-	if err != nil {
-		log.Fatalln(err)
+	type Option struct {
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
 	}
 
-	var bearer = "Bearer " + w.token
-	endpoint := w.baseurl + "auth/byOptions"
-	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(reqBody))
-	req.Header.Add("Authorization", bearer)
+	type payload struct {
+		Page    string `json:"page"`
+		Limit   string `json:"limit"`
+		Options Option `json:"options"`
+	}
 
-	scode, body, err = postRequest(req)
+	pl := payload{
+		Page:  page,
+		Limit: limit,
+		Options: Option{
+			FirstName: firstname,
+			LastName:  lastname,
+		},
+	}
+
+	reqBody, err := json.Marshal(pl)
 	if err != nil {
-		log.Fatalln(err)
+		return "Error", fmt.Errorf("error marshalling json: %w", err)
+	}
+	url := w.baseurl + "auth/getByOptions"
+
+	body, err = postRequest(url, reqBody, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving auth byoptions: %w", err)
 	}
 	return
 }
 
 // ByCustomer fetch authentication info using the customer id
-func (w Initializer) ByCustomer(customerID string) (scode int, body string, err error) {
+func (w Initializer) ByCustomer(customerID string) (body string, err error) {
 
 	reqBody, err := json.Marshal(map[string]string{
 		"customer": customerID,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		return "Error", fmt.Errorf("error marshalling json: %w", err)
 	}
 
-	var bearer = "Bearer " + w.token
 	endpoint := w.baseurl + "auth/getByCustomer"
-	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(reqBody))
-	req.Header.Add("Authorization", bearer)
 
-	scode, body, err = postRequest(req)
+	body, err = postRequest(endpoint, reqBody, w.token)
 	if err != nil {
-		log.Fatalln(err)
+		return "Error", fmt.Errorf("error retrieving auth bycustomer: %w", err)
 	}
 	return
 }
