@@ -36,7 +36,7 @@ type genPayload struct {
 }
 
 // NewOkra returns a struct that can be used to call all methods
-func NewOkra(t string, b string) Initializer {
+func NewOkra(t, b string) Initializer {
 	u := Initializer{
 		token:   t,
 		baseurl: b,
@@ -47,7 +47,13 @@ func NewOkra(t string, b string) Initializer {
 	return u
 }
 
-func postRequest(url string, reqBody []byte, token string) (body string, err error) {
+func postRequest(pl interface{}, url, token string) (body string, err error) {
+
+	reqBody, err := json.Marshal(pl)
+	if err != nil {
+		return "Error", fmt.Errorf("error marshalling json: %w", err)
+	}
+
 	var bearer = "Bearer " + token
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
 	if err != nil {
@@ -80,8 +86,7 @@ func postRequest(url string, reqBody []byte, token string) (body string, err err
 func (w Initializer) RetrieveAuth() (body string, err error) {
 
 	endpoint := w.baseurl + "products/auths"
-
-	body, err = postRequest(endpoint, nil, w.token)
+	body, err = postRequest(nil, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving auth token: %w", err)
 	}
@@ -90,22 +95,15 @@ func (w Initializer) RetrieveAuth() (body string, err error) {
 }
 
 // AuthByID fetches authentication info using the id of the authentication record.
-func (w Initializer) AuthByID(page string, limit string, i string) (body string, err error) {
+func (w Initializer) AuthByID(page, limit, i string) (body string, err error) {
 
 	pl := genPayload{
 		Page:  page,
 		Limit: limit,
 		ID:    i,
 	}
-
-	reqBody, err := json.Marshal(pl)
-	if err != nil {
-		return "Error", fmt.Errorf("error converting json: %w", err)
-	}
-
 	endpoint := w.baseurl + "auth/getById"
-
-	body, err = postRequest(endpoint, reqBody, w.token)
+	body, err = postRequest(pl, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error fetching auth using id: %w", err)
 	}
@@ -113,7 +111,7 @@ func (w Initializer) AuthByID(page string, limit string, i string) (body string,
 }
 
 // AuthByOptions fetches authentication info using the options metadata you provided when setting up the widget.
-func (w Initializer) AuthByOptions(page string, limit string, firstname string, lastname string) (body string, err error) {
+func (w Initializer) AuthByOptions(page, limit, firstname, lastname string) (body string, err error) {
 
 	pl := optionPayload{
 		Page:  page,
@@ -123,14 +121,9 @@ func (w Initializer) AuthByOptions(page string, limit string, firstname string, 
 			LastName:  lastname,
 		},
 	}
-
-	reqBody, err := json.Marshal(pl)
-	if err != nil {
-		return "Error", fmt.Errorf("error marshalling json: %w", err)
-	}
 	url := w.baseurl + "auth/getByOptions"
 
-	body, err = postRequest(url, reqBody, w.token)
+	body, err = postRequest(pl, url, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving auth byoptions: %w", err)
 	}
@@ -138,7 +131,7 @@ func (w Initializer) AuthByOptions(page string, limit string, firstname string, 
 }
 
 // AuthByCustomer fetches authentication info using the customer id
-func (w Initializer) AuthByCustomer(page string, limit string, customerID string) (body string, err error) {
+func (w Initializer) AuthByCustomer(page, limit, customerID string) (body string, err error) {
 
 	pl := genPayload{
 		Page:       page,
@@ -146,13 +139,8 @@ func (w Initializer) AuthByCustomer(page string, limit string, customerID string
 		CustomerID: customerID,
 	}
 
-	reqBody, err := json.Marshal(pl)
-	if err != nil {
-		return "Error", fmt.Errorf("error marshalling json: %w", err)
-	}
-
 	endpoint := w.baseurl + "auth/getByCustomer"
-	body, err = postRequest(endpoint, reqBody, w.token)
+	body, err = postRequest(pl, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving auth bycustomer: %w", err)
 	}
@@ -160,7 +148,7 @@ func (w Initializer) AuthByCustomer(page string, limit string, customerID string
 }
 
 // AuthByDateRange fetches authentication info using a date range.
-func (w Initializer) AuthByDateRange(page string, limit string, from string, to string) (body string, err error) {
+func (w Initializer) AuthByDateRange(page, limit, from, to string) (body string, err error) {
 
 	pl := genPayload{
 		Page:  page,
@@ -169,13 +157,8 @@ func (w Initializer) AuthByDateRange(page string, limit string, from string, to 
 		To:    to,
 	}
 
-	reqBody, err := json.Marshal(pl)
-	if err != nil {
-		return "Error", fmt.Errorf("error marshalling json: %w", err)
-	}
-
 	endpoint := w.baseurl + "auth/getByDate"
-	body, err = postRequest(endpoint, reqBody, w.token)
+	body, err = postRequest(pl, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving auth byDateRange: %w", err)
 	}
@@ -183,7 +166,7 @@ func (w Initializer) AuthByDateRange(page string, limit string, from string, to 
 }
 
 // AuthByBank fetches authentication info using the bank id.
-func (w Initializer) AuthByBank(page string, limit string, bankID string) (body string, err error) {
+func (w Initializer) AuthByBank(page, limit, bankID string) (body string, err error) {
 
 	pl := genPayload{
 		Page:   page,
@@ -191,13 +174,8 @@ func (w Initializer) AuthByBank(page string, limit string, bankID string) (body 
 		BankID: bankID,
 	}
 
-	reqBody, err := json.Marshal(pl)
-	if err != nil {
-		return "Error", fmt.Errorf("error marshalling json: %w", err)
-	}
-
 	endpoint := w.baseurl + "auth/getByBank"
-	body, err = postRequest(endpoint, reqBody, w.token)
+	body, err = postRequest(pl, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving auth byBank: %w", err)
 	}
@@ -205,7 +183,7 @@ func (w Initializer) AuthByBank(page string, limit string, bankID string) (body 
 }
 
 // AuthByCustomerDate fetches authentication for a customer using a date range and customer id.
-func (w Initializer) AuthByCustomerDate(page string, limit string, from string, to string, customerID string) (body string, err error) {
+func (w Initializer) AuthByCustomerDate(page, limit, from, to, customerID string) (body string, err error) {
 
 	pl := genPayload{
 		Page:       page,
@@ -215,13 +193,8 @@ func (w Initializer) AuthByCustomerDate(page string, limit string, from string, 
 		CustomerID: customerID,
 	}
 
-	reqBody, err := json.Marshal(pl)
-	if err != nil {
-		return "Error", fmt.Errorf("error marshalling json: %w", err)
-	}
-
 	endpoint := w.baseurl + "auth/getByDateCustomer"
-	body, err = postRequest(endpoint, reqBody, w.token)
+	body, err = postRequest(pl, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving auth byCustomerDate: %w", err)
 	}
@@ -237,7 +210,7 @@ func (w Initializer) RetrieveBalance() (body string, err error) {
 
 	endpoint := w.baseurl + "products/balances"
 
-	body, err = postRequest(endpoint, nil, w.token)
+	body, err = postRequest(nil, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving bank balance: %w", err)
 	}
@@ -246,7 +219,7 @@ func (w Initializer) RetrieveBalance() (body string, err error) {
 }
 
 // BalanceByID fetches balance info using the id of the balance.
-func (w Initializer) BalanceByID(page string, limit string, i string) (body string, err error) {
+func (w Initializer) BalanceByID(page, limit, i string) (body string, err error) {
 
 	pl := genPayload{
 		Page:  page,
@@ -254,14 +227,9 @@ func (w Initializer) BalanceByID(page string, limit string, i string) (body stri
 		ID:    i,
 	}
 
-	reqBody, err := json.Marshal(pl)
-	if err != nil {
-		return "Error", fmt.Errorf("error converting json: %w", err)
-	}
-
 	endpoint := w.baseurl + "balance/getById"
 
-	body, err = postRequest(endpoint, reqBody, w.token)
+	body, err = postRequest(pl, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error fetching balance using id: %w", err)
 	}
@@ -269,7 +237,7 @@ func (w Initializer) BalanceByID(page string, limit string, i string) (body stri
 }
 
 // BalanceByOptions fetches balance info using the options metadata you provided when setting up the widget.
-func (w Initializer) BalanceByOptions(page string, limit string, firstname string, lastname string) (body string, err error) {
+func (w Initializer) BalanceByOptions(page, limit, firstname, lastname string) (body string, err error) {
 
 	pl := optionPayload{
 		Page:  page,
@@ -279,14 +247,8 @@ func (w Initializer) BalanceByOptions(page string, limit string, firstname strin
 			LastName:  lastname,
 		},
 	}
-
-	reqBody, err := json.Marshal(pl)
-	if err != nil {
-		return "Error", fmt.Errorf("error marshalling json: %w", err)
-	}
 	url := w.baseurl + "balance/byOptions"
-
-	body, err = postRequest(url, reqBody, w.token)
+	body, err = postRequest(pl, url, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving balance byoptions: %w", err)
 	}
