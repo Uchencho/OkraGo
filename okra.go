@@ -14,6 +14,17 @@ type Initializer struct {
 	baseurl string
 }
 
+type option struct {
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+}
+
+type optionPayload struct {
+	Page    string `json:"page"`
+	Limit   string `json:"limit"`
+	Options option `json:"options"`
+}
+
 type genPayload struct {
 	Page       string `json:"page"`
 	Limit      string `json:"limit"`
@@ -21,6 +32,7 @@ type genPayload struct {
 	From       string `json:"from"`
 	To         string `json:"to"`
 	BankID     string `json:"bank"`
+	ID         string `json:"id"`
 }
 
 // NewOkra returns a struct that can be used to call all methods
@@ -78,11 +90,15 @@ func (w Initializer) RetrieveAuth() (body string, err error) {
 }
 
 // AuthByID fetches authentication info using the id of the authentication record.
-func (w Initializer) AuthByID(i string) (body string, err error) {
+func (w Initializer) AuthByID(page string, limit string, i string) (body string, err error) {
 
-	reqBody, err := json.Marshal(map[string]string{
-		"id": i,
-	})
+	pl := genPayload{
+		Page:  page,
+		Limit: limit,
+		ID:    i,
+	}
+
+	reqBody, err := json.Marshal(pl)
 	if err != nil {
 		return "Error", fmt.Errorf("error converting json: %w", err)
 	}
@@ -99,21 +115,10 @@ func (w Initializer) AuthByID(i string) (body string, err error) {
 // AuthByOptions fetches authentication info using the options metadata you provided when setting up the widget.
 func (w Initializer) AuthByOptions(page string, limit string, firstname string, lastname string) (body string, err error) {
 
-	type Option struct {
-		FirstName string `json:"first_name"`
-		LastName  string `json:"last_name"`
-	}
-
-	type payload struct {
-		Page    string `json:"page"`
-		Limit   string `json:"limit"`
-		Options Option `json:"options"`
-	}
-
-	pl := payload{
+	pl := optionPayload{
 		Page:  page,
 		Limit: limit,
-		Options: Option{
+		Options: option{
 			FirstName: firstname,
 			LastName:  lastname,
 		},
@@ -199,7 +204,7 @@ func (w Initializer) AuthByBank(page string, limit string, bankID string) (body 
 	return
 }
 
-// AuthByCustomerDate authentication for a customer using a date range and customer id.
+// AuthByCustomerDate fetches authentication for a customer using a date range and customer id.
 func (w Initializer) AuthByCustomerDate(page string, limit string, from string, to string, customerID string) (body string, err error) {
 
 	pl := genPayload{
@@ -238,4 +243,52 @@ func (w Initializer) RetrieveBalance() (body string, err error) {
 	}
 	return
 
+}
+
+// BalanceByID fetches balance info using the id of the balance.
+func (w Initializer) BalanceByID(page string, limit string, i string) (body string, err error) {
+
+	pl := genPayload{
+		Page:  page,
+		Limit: limit,
+		ID:    i,
+	}
+
+	reqBody, err := json.Marshal(pl)
+	if err != nil {
+		return "Error", fmt.Errorf("error converting json: %w", err)
+	}
+
+	endpoint := w.baseurl + "balance/getById"
+
+	body, err = postRequest(endpoint, reqBody, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error fetching balance using id: %w", err)
+	}
+	return
+}
+
+// BalanceByOptions fetches balance info using the options metadata you provided when setting up the widget.
+func (w Initializer) BalanceByOptions(page string, limit string, firstname string, lastname string) (body string, err error) {
+
+	pl := optionPayload{
+		Page:  page,
+		Limit: limit,
+		Options: option{
+			FirstName: firstname,
+			LastName:  lastname,
+		},
+	}
+
+	reqBody, err := json.Marshal(pl)
+	if err != nil {
+		return "Error", fmt.Errorf("error marshalling json: %w", err)
+	}
+	url := w.baseurl + "balance/byOptions"
+
+	body, err = postRequest(url, reqBody, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving balance byoptions: %w", err)
+	}
+	return
 }
