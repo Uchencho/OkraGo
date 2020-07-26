@@ -33,6 +33,12 @@ type genPayload struct {
 	To         string `json:"to"`
 	BankID     string `json:"bank"`
 	ID         string `json:"id"`
+	AccountID  string `json:"account"`
+	Type       string `json:"type"`
+	Amount     string `json:"amount"`
+	Account    string `json:"account_id"`
+	RecordID   string `json:"record_id"`
+	Currency   string `json:"currency"`
 }
 
 // NewOkra returns a struct that can be used to call all methods
@@ -193,7 +199,7 @@ func (w Client) AuthByCustomerDate(page, limit, from, to, customerID string) (bo
 		CustomerID: customerID,
 	}
 
-	endpoint := w.baseurl + "auth/getByDateCustomer"
+	endpoint := w.baseurl + "auth/getByCustomerDate"
 	body, err = postRequest(pl, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving auth byCustomerDate: %w", err)
@@ -251,6 +257,94 @@ func (w Client) BalanceByOptions(page, limit, firstname, lastname string) (body 
 	body, err = postRequest(pl, url, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving balance byoptions: %w", err)
+	}
+	return
+}
+
+// BalanceByCustomer fetches balance info using the customer id
+func (w Client) BalanceByCustomer(page, limit, customerID string) (body string, err error) {
+
+	pl := genPayload{
+		Page:       page,
+		Limit:      limit,
+		CustomerID: customerID,
+	}
+
+	endpoint := w.baseurl + "balance/getByCustomer"
+	body, err = postRequest(pl, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving balance bycustomer: %w", err)
+	}
+	return
+}
+
+// BalanceByAccount fetches balance info using the account id
+func (w Client) BalanceByAccount(page, limit, AccountID string) (body string, err error) {
+
+	pl := genPayload{
+		Page:      page,
+		Limit:     limit,
+		AccountID: AccountID,
+	}
+
+	endpoint := w.baseurl + "balance/getByAccount"
+	body, err = postRequest(pl, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving balance by accountID: %w", err)
+	}
+	return
+}
+
+// BalanceByType fetches balance info using type of balance
+func (w Client) BalanceByType(page, limit, theType, amount string) (body string, err error) {
+
+	pl := genPayload{
+		Page:   page,
+		Limit:  limit,
+		Type:   theType,
+		Amount: amount,
+	}
+
+	endpoint := w.baseurl + "balance/getByType"
+	body, err = postRequest(pl, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving balance by type: %w", err)
+	}
+	return
+}
+
+// BalanceByCustomerDate fetches balance info of a customer using a date range and customer id.
+func (w Client) BalanceByCustomerDate(page, limit, from, to, customerID string) (body string, err error) {
+
+	pl := genPayload{
+		Page:       page,
+		Limit:      limit,
+		From:       from,
+		To:         to,
+		CustomerID: customerID,
+	}
+
+	endpoint := w.baseurl + "balance/getByCustomerDate"
+	body, err = postRequest(pl, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving balance byCustomerDate: %w", err)
+	}
+	return
+}
+
+// RealTimeBalance fetches real-time BALANCE at anytime without heavy calculation of the transactions on each of an Record's accounts.
+func (w Client) RealTimeBalance(currency, recordID, accountID string) (body string, err error) {
+
+	pl := genPayload{
+		Currency: currency,
+		RecordID: recordID,
+		Account:  accountID,
+	}
+
+	endpoint := w.baseurl + "products/balance/periodic"
+	body, err = postRequest(pl, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving real time balance: %w", err)
 	}
 	return
 }
