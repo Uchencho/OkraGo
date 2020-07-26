@@ -88,6 +88,44 @@ func postRequest(pl interface{}, url, token string) (body string, err error) {
 	return
 }
 
+// general unexported byid function since all 5 products have similar signature
+func byID(page, limit, i, endpoint, token string) (body string, err error) {
+
+	pl := genPayload{
+		Page:  page,
+		Limit: limit,
+		ID:    i,
+	}
+
+	body, err = postRequest(pl, endpoint, token)
+	if err != nil {
+		return "Error", fmt.Errorf("error fetching product using id: %w", err)
+	}
+	return
+}
+
+// General byoptions function
+func byOptions(page, limit, firstname, lastname, url, token string) (body string, err error) {
+
+	pl := optionPayload{
+		Page:  page,
+		Limit: limit,
+		Options: option{
+			FirstName: firstname,
+			LastName:  lastname,
+		},
+	}
+	body, err = postRequest(pl, url, token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving product byoptions: %w", err)
+	}
+	return
+}
+
+/*
+Authentication product, documentation can be found at https://docs.okra.ng/products/auth
+*/
+
 // RetrieveAuth retrieves authentication of a user
 func (w Client) RetrieveAuth() (body string, err error) {
 
@@ -103,13 +141,8 @@ func (w Client) RetrieveAuth() (body string, err error) {
 // AuthByID fetches authentication info using the id of the authentication record.
 func (w Client) AuthByID(page, limit, i string) (body string, err error) {
 
-	pl := genPayload{
-		Page:  page,
-		Limit: limit,
-		ID:    i,
-	}
 	endpoint := w.baseurl + "auth/getById"
-	body, err = postRequest(pl, endpoint, w.token)
+	body, err = byID(page, limit, i, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error fetching auth using id: %w", err)
 	}
@@ -119,17 +152,8 @@ func (w Client) AuthByID(page, limit, i string) (body string, err error) {
 // AuthByOptions fetches authentication info using the options metadata you provided when setting up the widget.
 func (w Client) AuthByOptions(page, limit, firstname, lastname string) (body string, err error) {
 
-	pl := optionPayload{
-		Page:  page,
-		Limit: limit,
-		Options: option{
-			FirstName: firstname,
-			LastName:  lastname,
-		},
-	}
 	url := w.baseurl + "auth/getByOptions"
-
-	body, err = postRequest(pl, url, w.token)
+	body, err = byOptions(page, limit, firstname, lastname, url, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving auth byoptions: %w", err)
 	}
@@ -227,15 +251,8 @@ func (w Client) RetrieveBalance() (body string, err error) {
 // BalanceByID fetches balance info using the id of the balance.
 func (w Client) BalanceByID(page, limit, i string) (body string, err error) {
 
-	pl := genPayload{
-		Page:  page,
-		Limit: limit,
-		ID:    i,
-	}
-
 	endpoint := w.baseurl + "balance/getById"
-
-	body, err = postRequest(pl, endpoint, w.token)
+	body, err = byID(page, limit, i, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error fetching balance using id: %w", err)
 	}
@@ -245,16 +262,8 @@ func (w Client) BalanceByID(page, limit, i string) (body string, err error) {
 // BalanceByOptions fetches balance info using the options metadata you provided when setting up the widget.
 func (w Client) BalanceByOptions(page, limit, firstname, lastname string) (body string, err error) {
 
-	pl := optionPayload{
-		Page:  page,
-		Limit: limit,
-		Options: option{
-			FirstName: firstname,
-			LastName:  lastname,
-		},
-	}
 	url := w.baseurl + "balance/byOptions"
-	body, err = postRequest(pl, url, w.token)
+	body, err = byOptions(page, limit, firstname, lastname, url, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving balance byoptions: %w", err)
 	}
@@ -345,6 +354,44 @@ func (w Client) RealTimeBalance(currency, recordID, accountID string) (body stri
 	body, err = postRequest(pl, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving real time balance: %w", err)
+	}
+	return
+}
+
+/*
+Transaction product, documentation can be found at https://docs.okra.ng/products/transactions
+*/
+
+// RetrieveTransaction retrieves transactions
+func (w Client) RetrieveTransaction() (body string, err error) {
+
+	endpoint := w.baseurl + "products/transactions"
+	body, err = postRequest(nil, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving bank balance: %w", err)
+	}
+	return
+
+}
+
+// TransactionByID fetches transaction info using the id of the transaction.
+func (w Client) TransactionByID(page, limit, i string) (body string, err error) {
+
+	endpoint := w.baseurl + "transaction/getById"
+	body, err = byID(page, limit, i, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error fetching Transaction using id: %w", err)
+	}
+	return
+}
+
+// TransactionByOptions fetches transaction info using the options metadata you provided when setting up the widget.
+func (w Client) TransactionByOptions(page, limit, firstname, lastname string) (body string, err error) {
+
+	url := w.baseurl + "transaction/byOptions"
+	body, err = byOptions(page, limit, firstname, lastname, url, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving transaction byoptions: %w", err)
 	}
 	return
 }
