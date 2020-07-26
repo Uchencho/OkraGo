@@ -8,8 +8,8 @@ import (
 	"net/http"
 )
 
-// Initializer struct
-type Initializer struct {
+// Client struct
+type Client struct {
 	token   string
 	baseurl string
 }
@@ -36,8 +36,8 @@ type genPayload struct {
 }
 
 // NewOkra returns a struct that can be used to call all methods
-func NewOkra(t, b string) Initializer {
-	u := Initializer{
+func NewOkra(t, b string) Client {
+	u := Client{
 		token:   t,
 		baseurl: b,
 	}
@@ -83,7 +83,7 @@ func postRequest(pl interface{}, url, token string) (body string, err error) {
 }
 
 // RetrieveAuth retrieves authentication of a user
-func (w Initializer) RetrieveAuth() (body string, err error) {
+func (w Client) RetrieveAuth() (body string, err error) {
 
 	endpoint := w.baseurl + "products/auths"
 	body, err = postRequest(nil, endpoint, w.token)
@@ -95,7 +95,7 @@ func (w Initializer) RetrieveAuth() (body string, err error) {
 }
 
 // AuthByID fetches authentication info using the id of the authentication record.
-func (w Initializer) AuthByID(page, limit, i string) (body string, err error) {
+func (w Client) AuthByID(page, limit, i string) (body string, err error) {
 
 	pl := genPayload{
 		Page:  page,
@@ -111,7 +111,7 @@ func (w Initializer) AuthByID(page, limit, i string) (body string, err error) {
 }
 
 // AuthByOptions fetches authentication info using the options metadata you provided when setting up the widget.
-func (w Initializer) AuthByOptions(page, limit, firstname, lastname string) (body string, err error) {
+func (w Client) AuthByOptions(page, limit, firstname, lastname string) (body string, err error) {
 
 	pl := optionPayload{
 		Page:  page,
@@ -131,7 +131,7 @@ func (w Initializer) AuthByOptions(page, limit, firstname, lastname string) (bod
 }
 
 // AuthByCustomer fetches authentication info using the customer id
-func (w Initializer) AuthByCustomer(page, limit, customerID string) (body string, err error) {
+func (w Client) AuthByCustomer(page, limit, customerID string) (body string, err error) {
 
 	pl := genPayload{
 		Page:       page,
@@ -148,7 +148,7 @@ func (w Initializer) AuthByCustomer(page, limit, customerID string) (body string
 }
 
 // AuthByDateRange fetches authentication info using a date range.
-func (w Initializer) AuthByDateRange(page, limit, from, to string) (body string, err error) {
+func (w Client) AuthByDateRange(page, limit, from, to string) (body string, err error) {
 
 	pl := genPayload{
 		Page:  page,
@@ -166,7 +166,7 @@ func (w Initializer) AuthByDateRange(page, limit, from, to string) (body string,
 }
 
 // AuthByBank fetches authentication info using the bank id.
-func (w Initializer) AuthByBank(page, limit, bankID string) (body string, err error) {
+func (w Client) AuthByBank(page, limit, bankID string) (body string, err error) {
 
 	pl := genPayload{
 		Page:   page,
@@ -183,7 +183,7 @@ func (w Initializer) AuthByBank(page, limit, bankID string) (body string, err er
 }
 
 // AuthByCustomerDate fetches authentication for a customer using a date range and customer id.
-func (w Initializer) AuthByCustomerDate(page, limit, from, to, customerID string) (body string, err error) {
+func (w Client) AuthByCustomerDate(page, limit, from, to, customerID string) (body string, err error) {
 
 	pl := genPayload{
 		Page:       page,
@@ -206,7 +206,7 @@ Balance Product, documentation can be found here https://docs.okra.ng/products/b
 */
 
 // RetrieveBalance retrieves Bank balance
-func (w Initializer) RetrieveBalance() (body string, err error) {
+func (w Client) RetrieveBalance() (body string, err error) {
 
 	endpoint := w.baseurl + "products/balances"
 
@@ -219,7 +219,7 @@ func (w Initializer) RetrieveBalance() (body string, err error) {
 }
 
 // BalanceByID fetches balance info using the id of the balance.
-func (w Initializer) BalanceByID(page, limit, i string) (body string, err error) {
+func (w Client) BalanceByID(page, limit, i string) (body string, err error) {
 
 	pl := genPayload{
 		Page:  page,
@@ -237,7 +237,7 @@ func (w Initializer) BalanceByID(page, limit, i string) (body string, err error)
 }
 
 // BalanceByOptions fetches balance info using the options metadata you provided when setting up the widget.
-func (w Initializer) BalanceByOptions(page, limit, firstname, lastname string) (body string, err error) {
+func (w Client) BalanceByOptions(page, limit, firstname, lastname string) (body string, err error) {
 
 	pl := optionPayload{
 		Page:  page,
