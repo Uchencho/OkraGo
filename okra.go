@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 )
 
 // Client struct
@@ -41,7 +42,7 @@ type genPayload struct {
 	Currency   string `json:"currency"`
 }
 
-// NewOkra returns a struct that can be used to call all methods
+// NewOkra returns a struct that can be used to call all methods. Panics if empty arguements are used.
 func NewOkra(t, b string) Client {
 	u := Client{
 		token:   t,
@@ -80,7 +81,7 @@ func postRequest(pl interface{}, url, token string) (body string, err error) {
 		return "Error", fmt.Errorf("error reading body: %w", err)
 	}
 	if resp.StatusCode != 200 {
-		body = "Status code returned was: " + string(resp.StatusCode)
+		body = "Status code returned was: " + strconv.Itoa(resp.StatusCode)
 	} else {
 		body = string(bod)
 	}
@@ -557,6 +558,39 @@ func (w Client) IdentityByOptions(page, limit, firstname, lastname string) (body
 	body, err = byOptions(page, limit, firstname, lastname, url, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving identity byoptions: %w", err)
+	}
+	return
+}
+
+// IdentityByCustomer retrieve various account holder information on file using the customer id.
+func (w Client) IdentityByCustomer(page, limit, customerID string) (body string, err error) {
+
+	endpoint := w.baseurl + "identity/getByCustomer"
+	body, err = byCustomer(page, limit, customerID, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving identity bycustomer: %w", err)
+	}
+	return
+}
+
+// IdentityByDateRange fetches various account holder information on file using date range.
+func (w Client) IdentityByDateRange(page, limit, from, to string) (body string, err error) {
+
+	endpoint := w.baseurl + "identity/getByDate"
+	body, err = byDateRange(page, limit, from, to, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving identity byDateRange: %w", err)
+	}
+	return
+}
+
+// IdentityByCustomerDate fetches account holder information on file using date range and customer id.
+func (w Client) IdentityByCustomerDate(page, limit, from, to, customerID string) (body string, err error) {
+
+	endpoint := w.baseurl + "identity/getByCustomerDate"
+	body, err = byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving identity byCustomerDate: %w", err)
 	}
 	return
 }
