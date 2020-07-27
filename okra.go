@@ -523,3 +523,40 @@ func (w Client) PeriodicTransaction(currency, recordID, accountID string) (body 
 	}
 	return
 }
+
+/*
+Identity product, documentation can be found at https://docs.okra.ng/products/identity
+*/
+
+// RetrieveIdentity retrieves various account holder information on file
+func (w Client) RetrieveIdentity() (body string, err error) {
+
+	endpoint := w.baseurl + "products/identities"
+	body, err = postRequest(nil, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving account information: %w", err)
+	}
+	return
+}
+
+// IdentityByID fetches various account holder information on file using the id
+func (w Client) IdentityByID(page, limit, i string) (body string, err error) {
+
+	endpoint := w.baseurl + "identity/getById"
+	body, err = byID(page, limit, i, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error fetching identity using id: %w", err)
+	}
+	return
+}
+
+// IdentityByOptions fetches identity info using the options metadata you provided when setting up the widget.
+func (w Client) IdentityByOptions(page, limit, firstname, lastname string) (body string, err error) {
+
+	url := w.baseurl + "identity/byOptions"
+	body, err = byOptions(page, limit, firstname, lastname, url, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving identity byoptions: %w", err)
+	}
+	return
+}
