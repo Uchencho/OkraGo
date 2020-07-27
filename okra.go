@@ -43,7 +43,7 @@ type genPayload struct {
 }
 
 // NewOkra returns a struct that can be used to call all methods. Panics if empty arguements are used.
-func NewOkra(t, b string) Client {
+func New(t, b string) Client {
 	u := Client{
 		token:   t,
 		baseurl: b,
