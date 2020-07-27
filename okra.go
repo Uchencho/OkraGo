@@ -67,6 +67,7 @@ func postRequest(pl interface{}, url, token string) (body string, err error) {
 		return "Error", fmt.Errorf("error making http call: %w", err)
 	}
 	req.Header.Add("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json;charset=utf-8")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
