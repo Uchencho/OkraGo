@@ -122,6 +122,52 @@ func byOptions(page, limit, firstname, lastname, url, token string) (body string
 	return
 }
 
+func byCustomer(page, limit, customerID, endpoint, token string) (body string, err error) {
+
+	pl := genPayload{
+		Page:       page,
+		Limit:      limit,
+		CustomerID: customerID,
+	}
+
+	body, err = postRequest(pl, endpoint, token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving product bycustomer: %w", err)
+	}
+	return
+}
+
+func byDateRange(page, limit, from, to, endpoint, token string) (body string, err error) {
+
+	pl := genPayload{
+		Page:  page,
+		Limit: limit,
+		From:  from,
+		To:    to,
+	}
+	body, err = postRequest(pl, endpoint, token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving product byDateRange: %w", err)
+	}
+	return
+}
+
+func byCustomerDate(page, limit, from, to, customerID, endpoint, token string) (body string, err error) {
+
+	pl := genPayload{
+		Page:       page,
+		Limit:      limit,
+		From:       from,
+		To:         to,
+		CustomerID: customerID,
+	}
+	body, err = postRequest(pl, endpoint, token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving product byCustomerDate: %w", err)
+	}
+	return
+}
+
 /*
 Authentication product, documentation can be found at https://docs.okra.ng/products/auth
 */
@@ -163,14 +209,8 @@ func (w Client) AuthByOptions(page, limit, firstname, lastname string) (body str
 // AuthByCustomer fetches authentication info using the customer id
 func (w Client) AuthByCustomer(page, limit, customerID string) (body string, err error) {
 
-	pl := genPayload{
-		Page:       page,
-		Limit:      limit,
-		CustomerID: customerID,
-	}
-
 	endpoint := w.baseurl + "auth/getByCustomer"
-	body, err = postRequest(pl, endpoint, w.token)
+	body, err = byCustomer(page, limit, customerID, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving auth bycustomer: %w", err)
 	}
@@ -180,15 +220,8 @@ func (w Client) AuthByCustomer(page, limit, customerID string) (body string, err
 // AuthByDateRange fetches authentication info using a date range.
 func (w Client) AuthByDateRange(page, limit, from, to string) (body string, err error) {
 
-	pl := genPayload{
-		Page:  page,
-		Limit: limit,
-		From:  from,
-		To:    to,
-	}
-
 	endpoint := w.baseurl + "auth/getByDate"
-	body, err = postRequest(pl, endpoint, w.token)
+	body, err = byDateRange(page, limit, from, to, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving auth byDateRange: %w", err)
 	}
@@ -215,16 +248,8 @@ func (w Client) AuthByBank(page, limit, bankID string) (body string, err error) 
 // AuthByCustomerDate fetches authentication for a customer using a date range and customer id.
 func (w Client) AuthByCustomerDate(page, limit, from, to, customerID string) (body string, err error) {
 
-	pl := genPayload{
-		Page:       page,
-		Limit:      limit,
-		From:       from,
-		To:         to,
-		CustomerID: customerID,
-	}
-
 	endpoint := w.baseurl + "auth/getByCustomerDate"
-	body, err = postRequest(pl, endpoint, w.token)
+	body, err = byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving auth byCustomerDate: %w", err)
 	}
@@ -273,14 +298,8 @@ func (w Client) BalanceByOptions(page, limit, firstname, lastname string) (body 
 // BalanceByCustomer fetches balance info using the customer id
 func (w Client) BalanceByCustomer(page, limit, customerID string) (body string, err error) {
 
-	pl := genPayload{
-		Page:       page,
-		Limit:      limit,
-		CustomerID: customerID,
-	}
-
 	endpoint := w.baseurl + "balance/getByCustomer"
-	body, err = postRequest(pl, endpoint, w.token)
+	body, err = byCustomer(page, limit, customerID, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving balance bycustomer: %w", err)
 	}
@@ -325,24 +344,16 @@ func (w Client) BalanceByType(page, limit, theType, amount string) (body string,
 // BalanceByCustomerDate fetches balance info of a customer using a date range and customer id.
 func (w Client) BalanceByCustomerDate(page, limit, from, to, customerID string) (body string, err error) {
 
-	pl := genPayload{
-		Page:       page,
-		Limit:      limit,
-		From:       from,
-		To:         to,
-		CustomerID: customerID,
-	}
-
 	endpoint := w.baseurl + "balance/getByCustomerDate"
-	body, err = postRequest(pl, endpoint, w.token)
+	body, err = byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving balance byCustomerDate: %w", err)
 	}
 	return
 }
 
-// RealTimeBalance fetches real-time BALANCE at anytime without heavy calculation of the transactions on each of an Record's accounts.
-func (w Client) RealTimeBalance(currency, recordID, accountID string) (body string, err error) {
+// PeriodicBalance fetches real-time BALANCE at anytime without heavy calculation of the transactions on each of an Record's accounts.
+func (w Client) PeriodicBalance(currency, recordID, accountID string) (body string, err error) {
 
 	pl := genPayload{
 		Currency: currency,
@@ -392,6 +403,123 @@ func (w Client) TransactionByOptions(page, limit, firstname, lastname string) (b
 	body, err = byOptions(page, limit, firstname, lastname, url, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving transaction byoptions: %w", err)
+	}
+	return
+}
+
+// TransactionByCustomer fetches transaction info using the customer id
+func (w Client) TransactionByCustomer(page, limit, customerID string) (body string, err error) {
+
+	endpoint := w.baseurl + "transaction/getByCustomer"
+	body, err = byCustomer(page, limit, customerID, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving balance bycustomer: %w", err)
+	}
+	return
+}
+
+// TransactionByAccount fetches transaction info using the account id
+func (w Client) TransactionByAccount(page, limit, AccountID string) (body string, err error) {
+
+	pl := genPayload{
+		Page:      page,
+		Limit:     limit,
+		AccountID: AccountID,
+	}
+
+	endpoint := w.baseurl + "transaction/getByAccount"
+	body, err = postRequest(pl, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving transaction by accountID: %w", err)
+	}
+	return
+}
+
+// TransactionByDateRange fetches transaction info using a date range.
+func (w Client) TransactionByDateRange(page, limit, from, to string) (body string, err error) {
+
+	endpoint := w.baseurl + "transaction/getByDate"
+	body, err = byDateRange(page, limit, from, to, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving transaction byDateRange: %w", err)
+	}
+	return
+}
+
+// TransactionByBank fetches transaction info using the bank id.
+func (w Client) TransactionByBank(page, limit, bankID string) (body string, err error) {
+
+	pl := genPayload{
+		Page:   page,
+		Limit:  limit,
+		BankID: bankID,
+	}
+
+	endpoint := w.baseurl + "transaction/getByBank"
+	body, err = postRequest(pl, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving auth byBank: %w", err)
+	}
+	return
+}
+
+// TransactionByType fetches transaction info using type of balance
+func (w Client) TransactionByType(page, limit, theType, amount string) (body string, err error) {
+
+	pl := genPayload{
+		Page:   page,
+		Limit:  limit,
+		Type:   theType,
+		Amount: amount,
+	}
+
+	endpoint := w.baseurl + "transaction/getByType"
+	body, err = postRequest(pl, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving Transaction by type: %w", err)
+	}
+	return
+}
+
+// TransactionBySpendingPattern fetches spending pattern of a customer.
+func (w Client) TransactionBySpendingPattern(customerID string) (body string, err error) {
+
+	pl := genPayload{
+		CustomerID: customerID,
+	}
+
+	endpoint := w.baseurl + "products/transactions/spending-pattern"
+	body, err = postRequest(pl, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving spending pattern: %w", err)
+	}
+	return
+}
+
+// TransactionByCustomerDate fetches transaction info of a customer using a date range and customer id.
+func (w Client) TransactionByCustomerDate(page, limit, from, to, customerID string) (body string, err error) {
+
+	endpoint := w.baseurl + "transaction/getByCustomerDate"
+	body, err = byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving transaction byCustomerDate: %w", err)
+	}
+	return
+}
+
+// PeriodicTransaction fetches real-time TRANSACTION at anytime on each of an Record's accounts.
+func (w Client) PeriodicTransaction(currency, recordID, accountID string) (body string, err error) {
+
+	pl := genPayload{
+		Currency: currency,
+		RecordID: recordID,
+		Account:  accountID,
+	}
+
+	endpoint := w.baseurl + "products/transactions/periodic"
+	body, err = postRequest(pl, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving periodic transactions: %w", err)
 	}
 	return
 }
