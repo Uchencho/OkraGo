@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"path"
 	"strconv"
 )
 
@@ -171,9 +170,16 @@ func byCustomerDate(page, limit, from, to, customerID, endpoint, token string) (
 	return
 }
 
-func getEndpointURI(baseurl, endpointPath string) string {
-	return path.Join(baseurl, endpointPath)
-}
+// func getEndpointURI(baseurl, endpointPath string) string {
+// 	u, err := url.Parse(baseurl)
+// 	if err != nil {
+// 		panic("invalid url")
+// 	}
+// 	return path.Join(u.Path, endpointPath)
+
+// 	// error retrieving auth token: error doing request: Post "/sandbox/v1/products/auths": unsupported protocol scheme "" 5 Error
+
+// }
 
 /*
 Authentication product, documentation can be found at https://docs.okra.ng/products/auth
