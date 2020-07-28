@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"path"
 	"strconv"
 )
 
@@ -42,7 +43,7 @@ type genPayload struct {
 	Currency   string `json:"currency"`
 }
 
-// NewOkra returns a struct that can be used to call all methods. Panics if empty arguements are used.
+// New returns a struct that can be used to call all methods. Panics if empty arguements are used.
 func New(t, b string) Client {
 	u := Client{
 		token:   t,
@@ -170,6 +171,10 @@ func byCustomerDate(page, limit, from, to, customerID, endpoint, token string) (
 	return
 }
 
+func getEndpointURI(baseurl, endpointPath string) string {
+	return path.Join(baseurl, endpointPath)
+}
+
 /*
 Authentication product, documentation can be found at https://docs.okra.ng/products/auth
 */
@@ -178,6 +183,7 @@ Authentication product, documentation can be found at https://docs.okra.ng/produ
 func (w Client) RetrieveAuth() (body string, err error) {
 
 	endpoint := w.baseurl + "products/auths"
+	// endpoint := getEndpointURI(w.baseurl, "products/auths")
 	body, err = postRequest(nil, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving auth token: %w", err)
@@ -187,10 +193,10 @@ func (w Client) RetrieveAuth() (body string, err error) {
 }
 
 // AuthByID fetches authentication info using the id of the authentication record.
-func (w Client) AuthByID(page, limit, i string) (body string, err error) {
+func (w Client) AuthByID(page, limit, ID string) (body string, err error) {
 
 	endpoint := w.baseurl + "auth/getById"
-	body, err = byID(page, limit, i, endpoint, w.token)
+	body, err = byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error fetching auth using id: %w", err)
 	}
@@ -276,10 +282,10 @@ func (w Client) RetrieveBalance() (body string, err error) {
 }
 
 // BalanceByID fetches balance info using the id of the balance.
-func (w Client) BalanceByID(page, limit, i string) (body string, err error) {
+func (w Client) BalanceByID(page, limit, ID string) (body string, err error) {
 
 	endpoint := w.baseurl + "balance/getById"
-	body, err = byID(page, limit, i, endpoint, w.token)
+	body, err = byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error fetching balance using id: %w", err)
 	}
@@ -388,10 +394,10 @@ func (w Client) RetrieveTransaction() (body string, err error) {
 }
 
 // TransactionByID fetches transaction info using the id of the transaction.
-func (w Client) TransactionByID(page, limit, i string) (body string, err error) {
+func (w Client) TransactionByID(page, limit, ID string) (body string, err error) {
 
 	endpoint := w.baseurl + "transaction/getById"
-	body, err = byID(page, limit, i, endpoint, w.token)
+	body, err = byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error fetching Transaction using id: %w", err)
 	}
@@ -530,8 +536,8 @@ func (w Client) PeriodicTransaction(currency, recordID, accountID string) (body 
 Identity product, documentation can be found at https://docs.okra.ng/products/identity
 */
 
-// RetrieveIdentity retrieves various account holder information on file
-func (w Client) RetrieveIdentity() (body string, err error) {
+// RetrieveIdentities retrieves various account holder information on file
+func (w Client) RetrieveIdentities() (body string, err error) {
 
 	endpoint := w.baseurl + "products/identities"
 	body, err = postRequest(nil, endpoint, w.token)
@@ -542,10 +548,10 @@ func (w Client) RetrieveIdentity() (body string, err error) {
 }
 
 // IdentityByID fetches various account holder information on file using the id
-func (w Client) IdentityByID(page, limit, i string) (body string, err error) {
+func (w Client) IdentityByID(page, limit, ID string) (body string, err error) {
 
 	endpoint := w.baseurl + "identity/getById"
-	body, err = byID(page, limit, i, endpoint, w.token)
+	body, err = byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error fetching identity using id: %w", err)
 	}
