@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	baseurl = "https://api.okra.ng/sandbox/v1/"
+	baseurl = "https://api.okra.ng/sandbox/v1"
 	succeed = "\u2713"
 	failed  = "\u2717"
 )
@@ -18,7 +18,7 @@ var token = os.Getenv("OKRA_TOKEN")
 func TestInitializeOkra(t *testing.T) {
 	defer func() {
 		if r := recover(); r == nil {
-			t.Errorf("Okra New did not panic as a result of sending empty strings")
+			t.Fatalf("Okra New did not panic as a result of sending empty strings")
 		}
 	}()
 	_ = okra.New("", baseurl)

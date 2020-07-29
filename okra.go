@@ -50,6 +50,8 @@ func New(t, b string) Client {
 	}
 	if u.token == "" || u.baseurl == "" {
 		panic("Token and Base url is needed to call this Function")
+	} else if string(u.baseurl[len(u.baseurl)-1]) != "/" {
+		u.baseurl = u.baseurl + "/"
 	}
 	return u
 }
@@ -169,21 +171,6 @@ func byCustomerDate(page, limit, from, to, customerID, endpoint, token string) (
 	}
 	return
 }
-
-// func getEndpointURI(baseurl, endpointPath string) string {
-// 	u, err := url.Parse(baseurl)
-// 	if err != nil {
-// 		panic("invalid url")
-// 	}
-// 	return path.Join(u.Path, endpointPath)
-
-// 	// error retrieving auth token: error doing request: Post "/sandbox/v1/products/auths": unsupported protocol scheme "" 5 Error
-
-// }
-
-/*
-Authentication product, documentation can be found at https://docs.okra.ng/products/auth
-*/
 
 // RetrieveAuth retrieves authentication of a user
 func (w Client) RetrieveAuth() (body string, err error) {
