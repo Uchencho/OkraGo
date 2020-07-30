@@ -309,16 +309,19 @@ Balance Product, documentation can be found here https://docs.okra.ng/products/b
 */
 
 // RetrieveBalance retrieves Bank balance
-func (w Client) RetrieveBalance() (body string, err error) {
+func (w Client) RetrieveBalance() (body response.RetrieveBalancePayload, err error) {
 
 	endpoint := w.baseurl + "products/balances"
 
-	body, err = postRequest(nil, endpoint, w.token)
+	bod, err := postRequestByte(nil, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving bank balance: %w", err)
+		return body, fmt.Errorf("error retrieving bank balance: %w", err)
+	}
+	err = json.Unmarshal(bod, &body)
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
 	return
-
 }
 
 // BalanceByID fetches balance info using the id of the balance.
@@ -441,7 +444,8 @@ func (w Client) RetrieveTransaction() (body string, err error) {
 func (w Client) TransactionByID(page, limit, ID string) (body string, err error) {
 
 	endpoint := w.baseurl + "transaction/getById"
-	body, err = byID(page, limit, ID, endpoint, w.token)
+	bod, err := byID(page, limit, ID, endpoint, w.token)
+	body = string(bod)
 	if err != nil {
 		return "Error", fmt.Errorf("error fetching Transaction using id: %w", err)
 	}
@@ -595,11 +599,11 @@ func (w Client) RetrieveIdentities() (body string, err error) {
 func (w Client) IdentityByID(page, limit, ID string) (body string, err error) {
 
 	endpoint := w.baseurl + "identity/getById"
-	body, err = byID(page, limit, ID, endpoint, w.token)
+	bod, err := byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error fetching identity using id: %w", err)
 	}
-	return
+	return string(bod), err
 }
 
 // IdentityByOptions fetches identity info using the options metadata you provided when setting up the widget.
@@ -665,11 +669,11 @@ func (w Client) RetrieveIncome() (body string, err error) {
 func (w Client) IncomeByID(page, limit, ID string) (body string, err error) {
 
 	endpoint := w.baseurl + "income/getById"
-	body, err = byID(page, limit, ID, endpoint, w.token)
+	bod, err := byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error fetching income using id: %w", err)
 	}
-	return
+	return string(bod), err
 }
 
 // IncomeByCustomer retrieve information pertaining to a Record’s income using the customer id.
@@ -694,7 +698,7 @@ func (w Client) IncomeByCustomerDate(page, limit, from, to, customerID string) (
 	return
 }
 
-// ProcessIncome retrieve information pertaining to a Record’s income using the customer id and date range.
+// ProcessIncome retrieves the income of particular customer using the customer's id.
 func (w Client) ProcessIncome(customerID string) (body string, err error) {
 
 	pl := genPayload{

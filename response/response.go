@@ -2,7 +2,7 @@ package response
 
 import "time"
 
-type RetrieveAuthPayload []struct {
+type RetrieveAuthPayload struct {
 	StatusCode string `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
@@ -69,29 +69,32 @@ type AuthByIDPayload struct {
 	} `json:"data"`
 }
 
-type RetrieveBalancePayload []struct {
+type RetrieveBalancePayload struct {
 	StatusCode string `json:"statusCode"`
-	ID         string `json:"id"`
-	Customer   string `json:"customer"`
-	Account    struct {
-		Owner []struct {
-		} `json:"owner"`
-		Record []struct {
-		} `json:"record"`
-		ID   string `json:"_id"`
-		Name string `json:"name"`
-		Bank struct {
-		} `json:"bank"`
-		Customer struct {
-		} `json:"customer"`
-	} `json:"account"`
-	LedgerBalance    float64   `json:"ledger_balance"`
-	AvailableBalance int       `json:"available_balance"`
-	Currency         string    `json:"currency"`
-	Connected        []string  `json:"connected"`
-	Env              string    `json:"env"`
-	CreatedAt        time.Time `json:"created_at"`
-	LastUpdated      time.Time `json:"last_updated"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	Data       struct {
+		Pagination interface{} `json:"pagination"`
+		Balances   []struct {
+			ID      string `json:"id"`
+			Account struct {
+				ID   string `json:"_id"`
+				Bank struct {
+					ID   string `json:"_id"`
+					Name string `json:"name"`
+				} `json:"bank"`
+				Nuban string `json:"nuban"`
+				Name  string `json:"name"`
+			} `json:"account"`
+			LedgerBalance    float64   `json:"ledger_balance"`
+			AvailableBalance int       `json:"available_balance"`
+			Currency         string    `json:"currency"`
+			Connected        bool      `json:"connected"`
+			Env              string    `json:"env"`
+			CreatedAt        time.Time `json:"created_at"`
+			LastUpdated      time.Time `json:"last_updated"`
+		} `json:"balances"`
+	} `json:"data"`
 }
 
 // id = "5f03b2d5af4681496afdd84f"
