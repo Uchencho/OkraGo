@@ -84,7 +84,7 @@ func postRequest(pl interface{}, url, token string) (body string, err error) {
 		return "Error", fmt.Errorf("error reading body: %w", err)
 	}
 	if resp.StatusCode != 200 {
-		body = "Status code returned was: " + strconv.Itoa(resp.StatusCode)
+		body = "Invalid Status code returned was: " + strconv.Itoa(resp.StatusCode)
 	} else {
 		body = string(bod)
 	}
