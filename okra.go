@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	"github.com/Uchencho/okraGo/response"
 )
 
 // Client struct
@@ -92,6 +94,44 @@ func postRequest(pl interface{}, url, token string) (body string, err error) {
 	return
 }
 
+func postRequestByte(pl interface{}, url, token string) (body []byte, err error) {
+
+	reqBody, err := json.Marshal(pl)
+	if err != nil {
+		return body, fmt.Errorf("error marshalling json: %w", err)
+	}
+
+	var bearer = "Bearer " + token
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return body, fmt.Errorf("error making http call: %w", err)
+	}
+	req.Header.Add("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json;charset=utf-8")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return body, fmt.Errorf("error doing request: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return body, fmt.Errorf("error reading body: %w", err)
+	}
+	if resp.StatusCode != 200 {
+		body = []byte(`{"statusCode":resp.StatusCode}`)
+	}
+	// else {
+	// 	// How to append this to the byte created above
+	// 	// body = []byte(`{"statusCode":"200"}`)
+	// }
+
+	return
+}
+
 // general unexported byid function since all 5 products have similar signature
 func byID(page, limit, i, endpoint, token string) (body string, err error) {
 
@@ -173,13 +213,13 @@ func byCustomerDate(page, limit, from, to, customerID, endpoint, token string) (
 }
 
 // RetrieveAuth retrieves authentication of a user
-func (w Client) RetrieveAuth() (body string, err error) {
+func (w Client) RetrieveAuth() (body response.RetrieveAuthPayload, err error) {
 
 	endpoint := w.baseurl + "products/auths"
-	// endpoint := getEndpointURI(w.baseurl, "products/auths")
-	body, err = postRequest(nil, endpoint, w.token)
+	bod, err := postRequestByte(nil, endpoint, w.token)
+	_ = json.Unmarshal(bod, &body)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving auth token: %w", err)
+		return body, fmt.Errorf("error retrieving auth token: %w", err)
 	}
 	return
 

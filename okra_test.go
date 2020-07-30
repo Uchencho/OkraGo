@@ -28,8 +28,8 @@ func TestInitializeOkra(t *testing.T) {
 func TestRetrieveAuth(t *testing.T) {
 	okraClient := okra.New(token, baseurl)
 	body, err := okraClient.RetrieveAuth()
-	if err != nil || body[:7] == "Invalid" {
-		t.Fatalf("\t%s\tTest RetrieveAuth:\tGot Error: %v, and body : %v, Expected %v", failed, err, body, nil)
+	if err != nil || body.StatusCode != "" {
+		t.Fatalf("\t%s\tTest RetrieveAuth:\tGot Error: %v, and statuscode is : %v, Expected %v", failed, err, body.StatusCode, nil)
 	}
 	t.Logf("\t%s\tTest RetrieveAuth:\tShould have returned no errors.", succeed)
 }
