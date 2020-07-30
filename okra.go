@@ -133,7 +133,7 @@ func postRequestByte(pl interface{}, url, token string) (body []byte, err error)
 }
 
 // general unexported byid function since all 5 products have similar signature
-func byID(page, limit, i, endpoint, token string) (body string, err error) {
+func byID(page, limit, i, endpoint, token string) (body []byte, err error) {
 
 	pl := genPayload{
 		Page:  page,
@@ -141,9 +141,9 @@ func byID(page, limit, i, endpoint, token string) (body string, err error) {
 		ID:    i,
 	}
 
-	body, err = postRequest(pl, endpoint, token)
+	body, err = postRequestByte(pl, endpoint, token)
 	if err != nil {
-		return "Error", fmt.Errorf("error fetching product using id: %w", err)
+		return body, fmt.Errorf("error fetching product using id: %w", err)
 	}
 	return
 }
@@ -217,21 +217,28 @@ func (w Client) RetrieveAuth() (body response.RetrieveAuthPayload, err error) {
 
 	endpoint := w.baseurl + "products/auths"
 	bod, err := postRequestByte(nil, endpoint, w.token)
-	_ = json.Unmarshal(bod, &body)
 	if err != nil {
 		return body, fmt.Errorf("error retrieving auth token: %w", err)
+	}
+	err = json.Unmarshal(bod, &body)
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
 	return
 
 }
 
 // AuthByID fetches authentication info using the id of the authentication record.
-func (w Client) AuthByID(page, limit, ID string) (body string, err error) {
+func (w Client) AuthByID(page, limit, ID string) (body response.AuthByIDPayload, err error) {
 
 	endpoint := w.baseurl + "auth/getById"
-	body, err = byID(page, limit, ID, endpoint, w.token)
+	bod, err := byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error fetching auth using id: %w", err)
+		return body, fmt.Errorf("error fetching auth using id: %w", err)
+	}
+	err = json.Unmarshal(bod, &body)
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
 	return
 }
@@ -315,12 +322,16 @@ func (w Client) RetrieveBalance() (body string, err error) {
 }
 
 // BalanceByID fetches balance info using the id of the balance.
-func (w Client) BalanceByID(page, limit, ID string) (body string, err error) {
+func (w Client) BalanceByID(page, limit, ID string) (body response.BalanceByIDPayload, err error) {
 
 	endpoint := w.baseurl + "balance/getById"
-	body, err = byID(page, limit, ID, endpoint, w.token)
+	bod, err := byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error fetching balance using id: %w", err)
+		return body, fmt.Errorf("error fetching balance using id: %w", err)
+	}
+	err = json.Unmarshal(bod, &body)
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
 	return
 }
