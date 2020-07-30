@@ -10,7 +10,7 @@ import (
 func main() {
 
 	token := os.Getenv("OKRA_TOKEN")
-	// cID := "5e9d5dd3471ff50f735ad68a"
+	cID := "5e9d5dd3471ff50f735ad68a"
 	okraClient := okra.New(token, "https://api.okra.ng/sandbox/v1/")
 
 	// body2, err2 := okraClient.RetrieveAuth()
@@ -22,8 +22,15 @@ func main() {
 	// body3, err := okraClient.RetrieveBalance()
 	// fmt.Println(err, "\n\n", body3)
 
-	body, err := okraClient.RetrieveTransaction()
-	fmt.Println(err, body.Data, body.Message)
+	// body, err := okraClient.RetrieveTransaction()
+	// fmt.Println(err, body.Data, body.Message)
+
+	// body, err := okraClient.IdentityByDateRange("1", "50", "2015-01-01", "2020-08-01")
+	// fmt.Println(err, body)
+
+	body, err := okraClient.AuthByCustomerDate("1", "20", "2015-01-01", "2020-08-01", cID)
+	fmt.Println(err, body)
+
 }
 
 // {"status":"success","message":"There are no incomes available for this client","data":{"pagination":{},"incomes":[]}}

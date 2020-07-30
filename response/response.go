@@ -108,6 +108,85 @@ type AuthByCustomerIDPayload struct {
 	} `json:"data"`
 }
 
+type AuthByDateRangePayload struct {
+	StatusCode string `json:"statusCode"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	Data       struct {
+		Pagination struct {
+			TotalDocs     int         `json:"totalDocs"`
+			Limit         int         `json:"limit"`
+			HasPrevPage   bool        `json:"hasPrevPage"`
+			HasNextPage   bool        `json:"hasNextPage"`
+			Page          int         `json:"page"`
+			TotalPages    int         `json:"totalPages"`
+			PagingCounter int         `json:"pagingCounter"`
+			PrevPage      interface{} `json:"prevPage"`
+			NextPage      interface{} `json:"nextPage"`
+		} `json:"pagination"`
+		Auths []struct {
+			ID     string `json:"_id"`
+			Record string `json:"record"`
+			V      int    `json:"__v"`
+			Bank   struct {
+				Name   string `json:"name"`
+				Logo   string `json:"logo"`
+				Icon   string `json:"icon"`
+				Status string `json:"status"`
+			} `json:"bank"`
+			CreatedAt time.Time `json:"created_at"`
+			Customer  struct {
+				ID   string `json:"_id"`
+				Name string `json:"name"`
+			} `json:"customer"`
+			Env         string    `json:"env"`
+			LastUpdated time.Time `json:"last_updated"`
+			Owner       string    `json:"owner"`
+			Validated   bool      `json:"validated"`
+		} `json:"auths"`
+	} `json:"data"`
+}
+
+type AuthByCustomerDateRangePayload struct {
+	StatusCode string `json:"statusCode"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	Data       struct {
+		Pagination struct {
+			TotalDocs     int         `json:"totalDocs"`
+			Limit         int         `json:"limit"`
+			HasPrevPage   bool        `json:"hasPrevPage"`
+			HasNextPage   bool        `json:"hasNextPage"`
+			Page          int         `json:"page"`
+			TotalPages    int         `json:"totalPages"`
+			PagingCounter int         `json:"pagingCounter"`
+			PrevPage      interface{} `json:"prevPage"`
+			NextPage      interface{} `json:"nextPage"`
+		} `json:"pagination"`
+		Auths []struct {
+			ID     string `json:"_id"`
+			Record string `json:"record"`
+			V      int    `json:"__v"`
+			Bank   struct {
+				Name   string `json:"name"`
+				Logo   string `json:"logo"`
+				Icon   string `json:"icon"`
+				Status string `json:"status"`
+			} `json:"bank"`
+			CreatedAt time.Time `json:"created_at"`
+			Customer  struct {
+				ID   string `json:"_id"`
+				Name string `json:"name"`
+			} `json:"customer"`
+			Env         string    `json:"env"`
+			LastUpdated time.Time `json:"last_updated"`
+			Owner       string    `json:"owner"`
+			Validated   bool      `json:"validated"`
+		} `json:"auths"`
+	} `json:"data"`
+}
+
+// id = "5f03b2d5af4681496afdd84f"
 type RetrieveBalancePayload struct {
 	StatusCode string `json:"statusCode"`
 	Status     string `json:"status"`
@@ -135,8 +214,6 @@ type RetrieveBalancePayload struct {
 		} `json:"balances"`
 	} `json:"data"`
 }
-
-// id = "5f03b2d5af4681496afdd84f"
 
 type BalanceByIDPayload struct {
 	StatusCode string `json:"statusCode"`
@@ -285,6 +362,68 @@ type TransactionByCustomerIDPayload struct {
 			Code                   string        `json:"code"`
 			Credit                 int           `json:"credit"`
 			Debit                  interface{}   `json:"debit"`
+			TransDate              time.Time     `json:"trans_date"`
+			UnformattedTransDate   string        `json:"unformatted_trans_date"`
+			Customer               struct {
+				ID   string `json:"_id"`
+				Name string `json:"name"`
+			} `json:"customer"`
+			Account struct {
+				ID   string `json:"_id"`
+				Name string `json:"name"`
+			} `json:"account"`
+			Env  string `json:"env"`
+			Bank struct {
+				Name   string `json:"name"`
+				Logo   string `json:"logo"`
+				Icon   string `json:"icon"`
+				Status string `json:"status"`
+			} `json:"bank"`
+			CreatedAt   time.Time `json:"created_at"`
+			LastUpdated time.Time `json:"last_updated"`
+			V           int       `json:"__v"`
+		} `json:"transaction"`
+	} `json:"data"`
+}
+
+type TransactionByDateRangePayload struct {
+	StatusCode string `json:"statusCode"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	Data       struct {
+		Pagination struct {
+			TotalDocs     int         `json:"totalDocs"`
+			Limit         int         `json:"limit"`
+			HasPrevPage   bool        `json:"hasPrevPage"`
+			HasNextPage   bool        `json:"hasNextPage"`
+			Page          int         `json:"page"`
+			TotalPages    int         `json:"totalPages"`
+			PagingCounter int         `json:"pagingCounter"`
+			PrevPage      interface{} `json:"prevPage"`
+			NextPage      int         `json:"nextPage"`
+		} `json:"pagination"`
+		Transaction []struct {
+			Notes struct {
+				Topics        []string `json:"topics"`
+				Places        []string `json:"places"`
+				People        []string `json:"people"`
+				Actions       []string `json:"actions"`
+				Subjects      []string `json:"subjects"`
+				Preopositions []string `json:"preopositions"`
+				Desc          string   `json:"desc"`
+			} `json:"notes"`
+			Fetched                []string      `json:"fetched"`
+			Record                 []string      `json:"record"`
+			Analyzed               []interface{} `json:"analyzed"`
+			Ner                    interface{}   `json:"ner"`
+			NerV                   int           `json:"ner_v"`
+			ID                     string        `json:"_id"`
+			Branch                 string        `json:"branch"`
+			ClearedDate            time.Time     `json:"cleared_date"`
+			UnformattedClearedDate string        `json:"unformatted_cleared_date"`
+			Code                   string        `json:"code"`
+			Credit                 interface{}   `json:"credit"`
+			Debit                  int           `json:"debit"`
 			TransDate              time.Time     `json:"trans_date"`
 			UnformattedTransDate   string        `json:"unformatted_trans_date"`
 			Customer               struct {

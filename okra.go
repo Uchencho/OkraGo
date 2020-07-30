@@ -181,7 +181,7 @@ func byCustomer(page, limit, customerID, endpoint, token string) (body []byte, e
 	return
 }
 
-func byDateRange(page, limit, from, to, endpoint, token string) (body string, err error) {
+func byDateRange(page, limit, from, to, endpoint, token string) (body []byte, err error) {
 
 	pl := genPayload{
 		Page:  page,
@@ -189,9 +189,9 @@ func byDateRange(page, limit, from, to, endpoint, token string) (body string, er
 		From:  from,
 		To:    to,
 	}
-	body, err = postRequest(pl, endpoint, token)
+	body, err = postRequestByte(pl, endpoint, token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving product byDateRange: %w", err)
+		return body, fmt.Errorf("error retrieving product byDateRange: %w", err)
 	}
 	return
 }
@@ -270,12 +270,16 @@ func (w Client) AuthByCustomer(page, limit, customerID string) (body response.Au
 }
 
 // AuthByDateRange fetches authentication info using a date range.
-func (w Client) AuthByDateRange(page, limit, from, to string) (body string, err error) {
+func (w Client) AuthByDateRange(page, limit, from, to string) (body response.AuthByDateRangePayload, err error) {
 
 	endpoint := w.baseurl + "auth/getByDate"
-	body, err = byDateRange(page, limit, from, to, endpoint, w.token)
+	bod, err := byDateRange(page, limit, from, to, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving auth byDateRange: %w", err)
+		return body, fmt.Errorf("error retrieving auth byDateRange: %w", err)
+	}
+	err = json.Unmarshal(bod, &body)
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
 	return
 }
@@ -507,12 +511,16 @@ func (w Client) TransactionByAccount(page, limit, AccountID string) (body string
 }
 
 // TransactionByDateRange fetches transaction info using a date range.
-func (w Client) TransactionByDateRange(page, limit, from, to string) (body string, err error) {
+func (w Client) TransactionByDateRange(page, limit, from, to string) (body response.TransactionByDateRangePayload, err error) {
 
 	endpoint := w.baseurl + "transaction/getByDate"
-	body, err = byDateRange(page, limit, from, to, endpoint, w.token)
+	bod, err := byDateRange(page, limit, from, to, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving transaction byDateRange: %w", err)
+		return body, fmt.Errorf("error retrieving transaction byDateRange: %w", err)
+	}
+	err = json.Unmarshal(bod, &body)
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
 	return
 }
@@ -647,11 +655,11 @@ func (w Client) IdentityByCustomer(page, limit, customerID string) (body string,
 func (w Client) IdentityByDateRange(page, limit, from, to string) (body string, err error) {
 
 	endpoint := w.baseurl + "identity/getByDate"
-	body, err = byDateRange(page, limit, from, to, endpoint, w.token)
+	bod, err := byDateRange(page, limit, from, to, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving identity byDateRange: %w", err)
 	}
-	return
+	return string(bod), err
 }
 
 // IdentityByCustomerDate fetches account holder information on file using date range and customer id.
