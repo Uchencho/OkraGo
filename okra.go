@@ -50,6 +50,8 @@ func New(t, b string) Client {
 	}
 	if u.token == "" || u.baseurl == "" {
 		panic("Token and Base url is needed to call this Function")
+	} else if string(u.baseurl[len(u.baseurl)-1]) != "/" {
+		u.baseurl = u.baseurl + "/"
 	}
 	return u
 }
@@ -169,21 +171,6 @@ func byCustomerDate(page, limit, from, to, customerID, endpoint, token string) (
 	}
 	return
 }
-
-// func getEndpointURI(baseurl, endpointPath string) string {
-// 	u, err := url.Parse(baseurl)
-// 	if err != nil {
-// 		panic("invalid url")
-// 	}
-// 	return path.Join(u.Path, endpointPath)
-
-// 	// error retrieving auth token: error doing request: Post "/sandbox/v1/products/auths": unsupported protocol scheme "" 5 Error
-
-// }
-
-/*
-Authentication product, documentation can be found at https://docs.okra.ng/products/auth
-*/
 
 // RetrieveAuth retrieves authentication of a user
 func (w Client) RetrieveAuth() (body string, err error) {
@@ -604,6 +591,69 @@ func (w Client) IdentityByCustomerDate(page, limit, from, to, customerID string)
 	body, err = byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
 	if err != nil {
 		return "Error", fmt.Errorf("error retrieving identity byCustomerDate: %w", err)
+	}
+	return
+}
+
+/*
+Income product, documentation can be found at https://docs.okra.ng/products/income
+*/
+
+// RetrieveIncome retrieves income record
+func (w Client) RetrieveIncome() (body string, err error) {
+
+	endpoint := w.baseurl + "products/income/get"
+	body, err = postRequest(nil, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving income information: %w", err)
+	}
+	return
+}
+
+// IncomeByID retrieve information pertaining to a Record’s income using the id.
+func (w Client) IncomeByID(page, limit, ID string) (body string, err error) {
+
+	endpoint := w.baseurl + "income/getById"
+	body, err = byID(page, limit, ID, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error fetching income using id: %w", err)
+	}
+	return
+}
+
+// IncomeByCustomer retrieve information pertaining to a Record’s income using the customer id.
+func (w Client) IncomeByCustomer(page, limit, customerID string) (body string, err error) {
+
+	endpoint := w.baseurl + "income/getByCustomer"
+	body, err = byCustomer(page, limit, customerID, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving income bycustomer: %w", err)
+	}
+	return
+}
+
+// IncomeByCustomerDate retrieve information pertaining to a Record’s income using the customer id and date range.
+func (w Client) IncomeByCustomerDate(page, limit, from, to, customerID string) (body string, err error) {
+
+	endpoint := w.baseurl + "income/getByCustomerDate"
+	body, err = byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error retrieving income byCustomerDate: %w", err)
+	}
+	return
+}
+
+// ProcessIncome retrieve information pertaining to a Record’s income using the customer id and date range.
+func (w Client) ProcessIncome(customerID string) (body string, err error) {
+
+	pl := genPayload{
+		CustomerID: customerID,
+	}
+
+	endpoint := w.baseurl + "products/income/process"
+	body, err = postRequest(pl, endpoint, w.token)
+	if err != nil {
+		return "Error", fmt.Errorf("error processing income of a particular customer: %w", err)
 	}
 	return
 }
