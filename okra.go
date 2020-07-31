@@ -383,7 +383,7 @@ func (w Client) BalanceByCustomer(page, limit, customerID string) (body response
 }
 
 // BalanceByAccount fetches balance info using the account id
-func (w Client) BalanceByAccount(page, limit, AccountID string) (body string, err error) {
+func (w Client) BalanceByAccount(page, limit, AccountID string) (body response.BalanceByAccountPayload, err error) {
 
 	pl := genPayload{
 		Page:      page,
@@ -392,9 +392,13 @@ func (w Client) BalanceByAccount(page, limit, AccountID string) (body string, er
 	}
 
 	endpoint := w.baseurl + "balance/getByAccount"
-	body, err = postRequest(pl, endpoint, w.token)
+	bod, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving balance by accountID: %w", err)
+		return body, fmt.Errorf("error retrieving balance by accountID: %w", err)
+	}
+	err = json.Unmarshal(bod, &body)
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
 	return
 }
@@ -433,7 +437,7 @@ func (w Client) BalanceByCustomerDate(page, limit, from, to, customerID string) 
 }
 
 // PeriodicBalance fetches real-time BALANCE at anytime without heavy calculation of the transactions on each of an Record's accounts.
-func (w Client) PeriodicBalance(currency, recordID, accountID string) (body string, err error) {
+func (w Client) PeriodicBalance(currency, recordID, accountID string) (body response.PeriodicBalancePayload, err error) {
 
 	pl := genPayload{
 		Currency: currency,
@@ -442,9 +446,13 @@ func (w Client) PeriodicBalance(currency, recordID, accountID string) (body stri
 	}
 
 	endpoint := w.baseurl + "products/balance/periodic"
-	body, err = postRequest(pl, endpoint, w.token)
+	bod, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving real time balance: %w", err)
+		return body, fmt.Errorf("error retrieving real time balance: %w", err)
+	}
+	err = json.Unmarshal(bod, &body)
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
 	return
 }

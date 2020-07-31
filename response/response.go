@@ -387,6 +387,59 @@ type BalanceByCustomerDateRangePayload struct {
 	} `json:"data"`
 }
 
+type BalanceByAccountPayload struct {
+	StatusCode string `json:"statusCode"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	Data       struct {
+		Pagination struct {
+			TotalDocs     int         `json:"totalDocs"`
+			Limit         int         `json:"limit"`
+			HasPrevPage   bool        `json:"hasPrevPage"`
+			HasNextPage   bool        `json:"hasNextPage"`
+			Page          int         `json:"page"`
+			TotalPages    int         `json:"totalPages"`
+			PagingCounter int         `json:"pagingCounter"`
+			PrevPage      interface{} `json:"prevPage"`
+			NextPage      interface{} `json:"nextPage"`
+		} `json:"pagination"`
+		Balance []struct {
+			Periodic struct {
+				AvailableBalance []interface{} `json:"available_balance"`
+				LedgerBalance    []interface{} `json:"ledger_balance"`
+			} `json:"periodic"`
+			Connected []string `json:"connected"`
+			Owner     []string `json:"owner"`
+			Record    []string `json:"record"`
+			ID        string   `json:"_id"`
+			Account   struct {
+				ID   string `json:"_id"`
+				Name string `json:"name"`
+			} `json:"account"`
+			V                int       `json:"__v"`
+			AvailableBalance int       `json:"available_balance"`
+			CreatedAt        time.Time `json:"created_at"`
+			Currency         string    `json:"currency"`
+			Customer         struct {
+				ID   string `json:"_id"`
+				Name string `json:"name"`
+			} `json:"customer"`
+			Env           string    `json:"env"`
+			LastUpdated   time.Time `json:"last_updated"`
+			LedgerBalance float64   `json:"ledger_balance"`
+		} `json:"balance"`
+	} `json:"data"`
+}
+
+type PeriodicBalancePayload struct {
+	StatusCode string `json:"statusCode"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	Data       struct {
+		CallbackURL string `json:"callback_url"`
+	} `json:"data"`
+}
+
 // ----------
 // ----------
 
