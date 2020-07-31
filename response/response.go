@@ -186,7 +186,48 @@ type AuthByCustomerDateRangePayload struct {
 	} `json:"data"`
 }
 
-// id = "5f03b2d5af4681496afdd84f"
+type AuthByBankPayload struct {
+	StatusCode string `json:"statusCode"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	Data       struct {
+		Pagination struct {
+			TotalDocs     int         `json:"totalDocs"`
+			Limit         int         `json:"limit"`
+			HasPrevPage   bool        `json:"hasPrevPage"`
+			HasNextPage   bool        `json:"hasNextPage"`
+			Page          int         `json:"page"`
+			TotalPages    int         `json:"totalPages"`
+			PagingCounter int         `json:"pagingCounter"`
+			PrevPage      interface{} `json:"prevPage"`
+			NextPage      interface{} `json:"nextPage"`
+		} `json:"pagination"`
+		Auths []struct {
+			ID     string `json:"_id"`
+			Record string `json:"record"`
+			V      int    `json:"__v"`
+			Bank   struct {
+				Name   string `json:"name"`
+				Logo   string `json:"logo"`
+				Icon   string `json:"icon"`
+				Status string `json:"status"`
+			} `json:"bank"`
+			CreatedAt time.Time `json:"created_at"`
+			Customer  struct {
+				ID   string `json:"_id"`
+				Name string `json:"name"`
+			} `json:"customer"`
+			Env         string    `json:"env"`
+			LastUpdated time.Time `json:"last_updated"`
+			Owner       string    `json:"owner"`
+			Validated   bool      `json:"validated"`
+		} `json:"auths"`
+	} `json:"data"`
+}
+
+// --------------
+// --------------
+
 type RetrieveBalancePayload struct {
 	StatusCode string `json:"statusCode"`
 	Status     string `json:"status"`
@@ -302,6 +343,52 @@ type BalanceByCustomerIDPayload struct {
 		} `json:"balance"`
 	} `json:"data"`
 }
+
+type BalanceByCustomerDateRangePayload struct {
+	StatusCode string `json:"statusCode"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	Data       struct {
+		Pagination struct {
+			TotalDocs     int         `json:"totalDocs"`
+			Limit         int         `json:"limit"`
+			HasPrevPage   bool        `json:"hasPrevPage"`
+			HasNextPage   bool        `json:"hasNextPage"`
+			Page          int         `json:"page"`
+			TotalPages    int         `json:"totalPages"`
+			PagingCounter int         `json:"pagingCounter"`
+			PrevPage      interface{} `json:"prevPage"`
+			NextPage      interface{} `json:"nextPage"`
+		} `json:"pagination"`
+		Balance []struct {
+			Periodic struct {
+				AvailableBalance []interface{} `json:"available_balance"`
+				LedgerBalance    []interface{} `json:"ledger_balance"`
+			} `json:"periodic"`
+			Connected []string `json:"connected"`
+			Record    []string `json:"record"`
+			ID        string   `json:"_id"`
+			Account   struct {
+				ID   string `json:"_id"`
+				Name string `json:"name"`
+			} `json:"account"`
+			V                int       `json:"__v"`
+			AvailableBalance int       `json:"available_balance"`
+			CreatedAt        time.Time `json:"created_at"`
+			Currency         string    `json:"currency"`
+			Customer         struct {
+				ID   string `json:"_id"`
+				Name string `json:"name"`
+			} `json:"customer"`
+			Env           string    `json:"env"`
+			LastUpdated   time.Time `json:"last_updated"`
+			LedgerBalance float64   `json:"ledger_balance"`
+		} `json:"balance"`
+	} `json:"data"`
+}
+
+// ----------
+// ----------
 
 type RetrieveTransactionPayload struct {
 	StatusCode string `json:"statusCode"`
@@ -445,6 +532,114 @@ type TransactionByDateRangePayload struct {
 			LastUpdated time.Time `json:"last_updated"`
 			V           int       `json:"__v"`
 		} `json:"transaction"`
+	} `json:"data"`
+}
+
+type TransactionByCustomerDateRangePayload struct {
+	StatusCode string `json:"statusCode"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	Data       struct {
+		Pagination struct {
+			TotalDocs     int         `json:"totalDocs"`
+			Limit         int         `json:"limit"`
+			HasPrevPage   bool        `json:"hasPrevPage"`
+			HasNextPage   bool        `json:"hasNextPage"`
+			Page          int         `json:"page"`
+			TotalPages    int         `json:"totalPages"`
+			PagingCounter int         `json:"pagingCounter"`
+			PrevPage      interface{} `json:"prevPage"`
+			NextPage      int         `json:"nextPage"`
+		} `json:"pagination"`
+		Transaction []struct {
+			Notes struct {
+				Topics        []string `json:"topics"`
+				Places        []string `json:"places"`
+				People        []string `json:"people"`
+				Actions       []string `json:"actions"`
+				Subjects      []string `json:"subjects"`
+				Preopositions []string `json:"preopositions"`
+				Desc          string   `json:"desc"`
+			} `json:"notes"`
+			Fetched                []string      `json:"fetched"`
+			Record                 []string      `json:"record"`
+			Analyzed               []interface{} `json:"analyzed"`
+			Ner                    interface{}   `json:"ner"`
+			NerV                   int           `json:"ner_v"`
+			ID                     string        `json:"_id"`
+			Branch                 string        `json:"branch"`
+			ClearedDate            time.Time     `json:"cleared_date"`
+			UnformattedClearedDate string        `json:"unformatted_cleared_date"`
+			Code                   string        `json:"code"`
+			Credit                 int           `json:"credit"`
+			Debit                  interface{}   `json:"debit"`
+			TransDate              time.Time     `json:"trans_date"`
+			UnformattedTransDate   string        `json:"unformatted_trans_date"`
+			Customer               struct {
+				ID   string `json:"_id"`
+				Name string `json:"name"`
+			} `json:"customer"`
+			Account struct {
+				ID   string `json:"_id"`
+				Name string `json:"name"`
+			} `json:"account"`
+			Env  string `json:"env"`
+			Bank struct {
+				Name   string `json:"name"`
+				Logo   string `json:"logo"`
+				Icon   string `json:"icon"`
+				Status string `json:"status"`
+			} `json:"bank"`
+			CreatedAt   time.Time `json:"created_at"`
+			LastUpdated time.Time `json:"last_updated"`
+			V           int       `json:"__v"`
+		} `json:"transaction"`
+	} `json:"data"`
+}
+
+// -------------------
+// -------------------
+
+type IdentityByCustomerDatePayload struct {
+	StatusCode string `json:"statusCode"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	Data       struct {
+		Pagination struct {
+			TotalDocs     int         `json:"totalDocs"`
+			Limit         int         `json:"limit"`
+			HasPrevPage   bool        `json:"hasPrevPage"`
+			HasNextPage   bool        `json:"hasNextPage"`
+			Page          int         `json:"page"`
+			TotalPages    int         `json:"totalPages"`
+			PagingCounter int         `json:"pagingCounter"`
+			PrevPage      interface{} `json:"prevPage"`
+			NextPage      interface{} `json:"nextPage"`
+		} `json:"pagination"`
+		Identity []interface{} `json:"identity"`
+	} `json:"data"`
+}
+
+// -------------------
+// -------------------
+
+type IncomeByCustomerDatePayload struct {
+	StatusCode string `json:"statusCode"`
+	Status     string `json:"status"`
+	Message    string `json:"message"`
+	Data       struct {
+		Pagination struct {
+			TotalDocs     int         `json:"totalDocs"`
+			Limit         int         `json:"limit"`
+			HasPrevPage   bool        `json:"hasPrevPage"`
+			HasNextPage   bool        `json:"hasNextPage"`
+			Page          int         `json:"page"`
+			TotalPages    int         `json:"totalPages"`
+			PagingCounter int         `json:"pagingCounter"`
+			PrevPage      interface{} `json:"prevPage"`
+			NextPage      interface{} `json:"nextPage"`
+		} `json:"pagination"`
+		Income []interface{} `json:"income"`
 	} `json:"data"`
 }
 
