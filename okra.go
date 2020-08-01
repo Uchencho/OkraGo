@@ -608,7 +608,7 @@ func (w Client) TransactionByType(page, limit, theType, amount string) (body str
 func (w Client) TransactionBySpendingPattern(customerID string) (body string, err error) {
 
 	pl := genPayload{
-		CustomerID: customerID,
+		Customer: customerID,
 	}
 
 	endpoint := w.baseurl + "products/transactions/spending-pattern"
