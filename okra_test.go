@@ -38,8 +38,8 @@ func TestTransactionByCustomerID(t *testing.T) {
 	okraClient := okra.New(token, baseurl)
 	cID := "5e9d5dd3471ff50f735ad68a"
 	body, err := okraClient.TransactionByCustomer("1", "30", cID)
-	if err != nil {
-		t.Fatalf("\t%s\tTest TransactionByCustomer:\tGot Error: %v, and body : %v, Expected %v", failed, err, body, nil)
+	if err != nil || body.StatusCode != 200 {
+		t.Fatalf("\t%s\tTest TransactionByCustomer:\tGot Error: %v, and statuscode : %v, Expected %v", failed, err, body.StatusCode, nil)
 	}
 	t.Logf("\t%s\tTest TransactionByCustomer:\tShould have returned no errors.", succeed)
 }

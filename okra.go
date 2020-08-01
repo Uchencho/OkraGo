@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 
 	"github.com/Uchencho/okraGo/response"
 )
@@ -59,42 +58,6 @@ func New(t, b string) Client {
 	return u
 }
 
-func postRequest(pl interface{}, url, token string) (body string, err error) {
-
-	reqBody, err := json.Marshal(pl)
-	if err != nil {
-		return "Error", fmt.Errorf("error marshalling json: %w", err)
-	}
-
-	var bearer = "Bearer " + token
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
-	if err != nil {
-		return "Error", fmt.Errorf("error making http call: %w", err)
-	}
-	req.Header.Add("Authorization", bearer)
-	req.Header.Set("Content-Type", "application/json;charset=utf-8")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return "Error", fmt.Errorf("error doing request: %w", err)
-	}
-
-	defer resp.Body.Close()
-
-	bod, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "Error", fmt.Errorf("error reading body: %w", err)
-	}
-	if resp.StatusCode != 200 {
-		body = "Invalid Status code returned was: " + strconv.Itoa(resp.StatusCode)
-	} else {
-		body = string(bod)
-	}
-
-	return
-}
-
 func postRequestByte(pl interface{}, url, token string) (body []byte, code int, err error) {
 
 	reqBody, err := json.Marshal(pl)
@@ -144,7 +107,7 @@ func byID(page, limit, i, endpoint, token string) (body []byte, code int, err er
 }
 
 // General byoptions function
-func byOptions(page, limit, firstname, lastname, url, token string) (body string, err error) {
+func byOptions(page, limit, firstname, lastname, url, token string) (body string, code int, err error) {
 
 	pl := optionPayload{
 		Page:  page,
@@ -154,11 +117,11 @@ func byOptions(page, limit, firstname, lastname, url, token string) (body string
 			LastName:  lastname,
 		},
 	}
-	body, err = postRequest(pl, url, token)
+	bod, code, err := postRequestByte(pl, url, token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving product byoptions: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving product byoptions: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
 
 func byCustomer(page, limit, customerID, endpoint, token string) (body []byte, code int, err error) {
@@ -243,14 +206,14 @@ func (w Client) AuthByID(page, limit, ID string) (body response.AuthByIDPayload,
 }
 
 // AuthByOptions fetches authentication info using the options metadata you provided when setting up the widget.
-func (w Client) AuthByOptions(page, limit, firstname, lastname string) (body string, err error) {
+func (w Client) AuthByOptions(page, limit, firstname, lastname string) (body string, code int, err error) {
 
 	url := w.baseurl + "auth/getByOptions"
-	body, err = byOptions(page, limit, firstname, lastname, url, w.token)
+	bod, code, err := byOptions(page, limit, firstname, lastname, url, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving auth byoptions: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving auth byoptions: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
 
 // AuthByCustomer fetches authentication info using the customer id
@@ -367,14 +330,14 @@ func (w Client) BalanceByID(page, limit, ID string) (body response.BalanceByIDPa
 }
 
 // BalanceByOptions fetches balance info using the options metadata you provided when setting up the widget.
-func (w Client) BalanceByOptions(page, limit, firstname, lastname string) (body string, err error) {
+func (w Client) BalanceByOptions(page, limit, firstname, lastname string) (body string, code int, err error) {
 
 	url := w.baseurl + "balance/byOptions"
-	body, err = byOptions(page, limit, firstname, lastname, url, w.token)
+	bod, code, err := byOptions(page, limit, firstname, lastname, url, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving balance byoptions: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving balance byoptions: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
 
 // BalanceByCustomer fetches balance info using the customer id
@@ -418,7 +381,7 @@ func (w Client) BalanceByAccount(page, limit, AccountID string) (body response.B
 }
 
 // BalanceByType fetches balance info using type of balance
-func (w Client) BalanceByType(page, limit, theType, amount string) (body string, err error) {
+func (w Client) BalanceByType(page, limit, theType, amount string) (body string, code int, err error) {
 
 	pl := genPayload{
 		Page:   page,
@@ -428,11 +391,11 @@ func (w Client) BalanceByType(page, limit, theType, amount string) (body string,
 	}
 
 	endpoint := w.baseurl + "balance/getByType"
-	body, err = postRequest(pl, endpoint, w.token)
+	bod, code, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving balance by type: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving balance by type: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
 
 // BalanceByCustomerDate fetches balance info of a customer using a date range and customer id.
@@ -508,14 +471,14 @@ func (w Client) TransactionByID(page, limit, ID string) (body string, code int, 
 }
 
 // TransactionByOptions fetches transaction info using the options metadata you provided when setting up the widget.
-func (w Client) TransactionByOptions(page, limit, firstname, lastname string) (body string, err error) {
+func (w Client) TransactionByOptions(page, limit, firstname, lastname string) (body string, code int, err error) {
 
 	url := w.baseurl + "transaction/byOptions"
-	body, err = byOptions(page, limit, firstname, lastname, url, w.token)
+	bod, code, err := byOptions(page, limit, firstname, lastname, url, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving transaction byoptions: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving transaction byoptions: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
 
 // TransactionByCustomer fetches transaction info using the customer id
@@ -536,7 +499,7 @@ func (w Client) TransactionByCustomer(page, limit, customerID string) (body resp
 }
 
 // TransactionByAccount fetches transaction info using the account id
-func (w Client) TransactionByAccount(page, limit, AccountID string) (body string, err error) {
+func (w Client) TransactionByAccount(page, limit, AccountID string) (body string, code int, err error) {
 
 	pl := genPayload{
 		Page:      page,
@@ -545,11 +508,11 @@ func (w Client) TransactionByAccount(page, limit, AccountID string) (body string
 	}
 
 	endpoint := w.baseurl + "transaction/getByAccount"
-	body, err = postRequest(pl, endpoint, w.token)
+	bod, code, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving transaction by accountID: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving transaction by accountID: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
 
 // TransactionByDateRange fetches transaction info using a date range.
@@ -570,7 +533,7 @@ func (w Client) TransactionByDateRange(page, limit, from, to string) (body respo
 }
 
 // TransactionByBank fetches transaction info using the bank id.
-func (w Client) TransactionByBank(page, limit, bankID string) (body string, err error) {
+func (w Client) TransactionByBank(page, limit, bankID string) (body response.TransactionByBankIDPayload, err error) {
 
 	pl := genPayload{
 		Page:   page,
@@ -579,15 +542,21 @@ func (w Client) TransactionByBank(page, limit, bankID string) (body string, err 
 	}
 
 	endpoint := w.baseurl + "transaction/getByBank"
-	body, err = postRequest(pl, endpoint, w.token)
+	bod, code, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving auth byBank: %w", err)
+		body.StatusCode = code
+		return body, fmt.Errorf("error retrieving auth byBank: %w", err)
+	}
+	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
 	return
 }
 
 // TransactionByType fetches transaction info using type of balance
-func (w Client) TransactionByType(page, limit, theType, amount string) (body string, err error) {
+func (w Client) TransactionByType(page, limit, theType, amount string) (body string, code int, err error) {
 
 	pl := genPayload{
 		Page:   page,
@@ -597,26 +566,26 @@ func (w Client) TransactionByType(page, limit, theType, amount string) (body str
 	}
 
 	endpoint := w.baseurl + "transaction/getByType"
-	body, err = postRequest(pl, endpoint, w.token)
+	bod, code, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving Transaction by type: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving Transaction by type: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
 
 // TransactionBySpendingPattern fetches spending pattern of a customer.
-func (w Client) TransactionBySpendingPattern(customerID string) (body string, err error) {
+func (w Client) TransactionBySpendingPattern(customerID string) (body string, code int, err error) {
 
 	pl := genPayload{
 		Customer: customerID,
 	}
 
 	endpoint := w.baseurl + "products/transactions/spending-pattern"
-	body, err = postRequest(pl, endpoint, w.token)
+	bod, code, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving spending pattern: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving spending pattern: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
 
 // TransactionByCustomerDate fetches transaction info of a customer using a date range and customer id.
@@ -644,7 +613,7 @@ func (w Client) TransactionByCustomerDate(page, limit, from, to, customerID stri
 }
 
 // PeriodicTransaction fetches real-time TRANSACTION at anytime on each of an Record's accounts.
-func (w Client) PeriodicTransaction(currency, recordID, accountID string) (body string, err error) {
+func (w Client) PeriodicTransaction(currency, recordID, accountID string) (body string, code int, err error) {
 
 	pl := genPayload{
 		Currency: currency,
@@ -653,11 +622,11 @@ func (w Client) PeriodicTransaction(currency, recordID, accountID string) (body 
 	}
 
 	endpoint := w.baseurl + "products/transactions/periodic"
-	body, err = postRequest(pl, endpoint, w.token)
+	bod, code, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving periodic transactions: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving periodic transactions: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
 
 /*
@@ -665,14 +634,14 @@ Identity product, documentation can be found at https://docs.okra.ng/products/id
 */
 
 // RetrieveIdentities retrieves various account holder information on file
-func (w Client) RetrieveIdentities() (body string, err error) {
+func (w Client) RetrieveIdentities() (body string, cod int, err error) {
 
 	endpoint := w.baseurl + "products/identities"
-	body, err = postRequest(nil, endpoint, w.token)
+	bod, code, err := postRequestByte(nil, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving account information: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving account information: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
 
 // IdentityByID fetches various account holder information on file using the id
@@ -687,14 +656,14 @@ func (w Client) IdentityByID(page, limit, ID string) (body string, code int, err
 }
 
 // IdentityByOptions fetches identity info using the options metadata you provided when setting up the widget.
-func (w Client) IdentityByOptions(page, limit, firstname, lastname string) (body string, err error) {
+func (w Client) IdentityByOptions(page, limit, firstname, lastname string) (body string, code int, err error) {
 
 	url := w.baseurl + "identity/byOptions"
-	body, err = byOptions(page, limit, firstname, lastname, url, w.token)
+	bod, code, err := byOptions(page, limit, firstname, lastname, url, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving identity byoptions: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving identity byoptions: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
 
 // IdentityByCustomer retrieve various account holder information on file using the customer id.
@@ -747,14 +716,14 @@ Income product, documentation can be found at https://docs.okra.ng/products/inco
 */
 
 // RetrieveIncome retrieves income record
-func (w Client) RetrieveIncome() (body string, err error) {
+func (w Client) RetrieveIncome() (body string, code int, err error) {
 
 	endpoint := w.baseurl + "products/income/get"
-	body, err = postRequest(nil, endpoint, w.token)
+	bod, code, err := postRequestByte(nil, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving income information: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving income information: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
 
 // IncomeByID retrieve information pertaining to a Record’s income using the id.
@@ -797,16 +766,16 @@ func (w Client) IncomeByCustomerDate(page, limit, from, to, customerID string) (
 }
 
 // ProcessIncome retrieves the income of particular customer using the customer's id.
-func (w Client) ProcessIncome(customerID string) (body string, err error) {
+func (w Client) ProcessIncome(customerID string) (body string, code int, err error) {
 
 	pl := genPayload{
 		CustomerID: customerID,
 	}
 
 	endpoint := w.baseurl + "products/income/process"
-	body, err = postRequest(pl, endpoint, w.token)
+	bod, code, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error processing income of a particular customer: %w", err)
+		return "Error", code, fmt.Errorf("error processing income of a particular customer: %w", err)
 	}
-	return
+	return string(bod), code, err
 }
