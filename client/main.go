@@ -1,21 +1,21 @@
 package main
 
-import (
-	"fmt"
-	"os"
+// import (
+// 	"fmt"
+// 	"os"
 
-	okra "github.com/Uchencho/OkraGo"
-)
+// 	okra "github.com/Uchencho/OkraGo"
+// )
 
 func main() {
 
-	token := os.Getenv("OKRA_TOKEN")
+	// token := os.Getenv("OKRA_TOKEN")
 	// cID := "5e9d5dd3471ff50f735ad68a"
 	// const (
 	// 	bankID = "5d6fe57a4099cc4b210bbeae"
 	// bID = "5d6fe57a4099cc4b210bbeb1"
 	// )
-	okraClient := okra.New(token, "https://api.okra.ng/sandbox/v1/")
+	// okraClient := okra.New(token, "https://api.okra.ng/sandbox/v1/")
 
 	// body2, err2 := okraClient.RetrieveTransaction()
 	// fmt.Println(err2, "\n\n", body2.Data, body2.StatusCode)
@@ -38,8 +38,8 @@ func main() {
 	// body3, err := okraClient.BalanceByOptions("1", "20", "James", "Galler")
 	// fmt.Println(err, "\n\n", body3)
 
-	body, code, err := okraClient.RetrieveIncome()
-	fmt.Println(err, body, code)
+	// body, code, err := okraClient.RetrieveIncome()
+	// fmt.Println(err, body, code)
 
 	// body2, err2 := okraClient.RetrieveTransaction()
 	// fmt.Println(err2, body2.Data, body2.Message)
