@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/Uchencho/okraGo/response"
+	"github.com/Uchencho/OkraGo/response"
 )
 
 // Client struct

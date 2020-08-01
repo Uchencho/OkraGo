@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	okra "github.com/Uchencho/okraGo"
+	okra "github.com/Uchencho/OkraGo"
 )
 
 const (
