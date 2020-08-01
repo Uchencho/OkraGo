@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 // import (
 // 	"fmt"
 // 	"os"
@@ -8,6 +10,8 @@ package main
 // )
 
 func main() {
+
+	fmt.Println("Please work")
 
 	// token := os.Getenv("OKRA_TOKEN")
 	// cID := "5e9d5dd3471ff50f735ad68a"
