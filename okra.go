@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/Uchencho/OkraGo/response"
 )
 
 // Client struct
@@ -171,7 +169,7 @@ func byCustomerDate(page, limit, from, to, customerID, endpoint, token string) (
 }
 
 // RetrieveAuth retrieves authentication of a user
-func (w Client) RetrieveAuth() (body response.RetrieveAuthPayload, err error) {
+func (w Client) RetrieveAuth() (body RetrieveAuthPayload, err error) {
 
 	endpoint := w.baseurl + "products/auths"
 	bod, code, err := postRequestByte(nil, endpoint, w.token)
@@ -189,7 +187,7 @@ func (w Client) RetrieveAuth() (body response.RetrieveAuthPayload, err error) {
 }
 
 // AuthByID fetches authentication info using the id of the authentication record.
-func (w Client) AuthByID(page, limit, ID string) (body response.AuthByIDPayload, err error) {
+func (w Client) AuthByID(page, limit, ID string) (body AuthByIDPayload, err error) {
 
 	endpoint := w.baseurl + "auth/getById"
 	bod, code, err := byID(page, limit, ID, endpoint, w.token)
@@ -217,7 +215,7 @@ func (w Client) AuthByOptions(page, limit, firstname, lastname string) (body str
 }
 
 // AuthByCustomer fetches authentication info using the customer id
-func (w Client) AuthByCustomer(page, limit, customerID string) (body response.AuthByCustomerIDPayload, err error) {
+func (w Client) AuthByCustomer(page, limit, customerID string) (body AuthByCustomerIDPayload, err error) {
 
 	endpoint := w.baseurl + "auth/getByCustomer"
 	bod, code, err := byCustomer(page, limit, customerID, endpoint, w.token)
@@ -234,7 +232,7 @@ func (w Client) AuthByCustomer(page, limit, customerID string) (body response.Au
 }
 
 // AuthByDateRange fetches authentication info using a date range.
-func (w Client) AuthByDateRange(page, limit, from, to string) (body response.AuthByDateRangePayload, err error) {
+func (w Client) AuthByDateRange(page, limit, from, to string) (body AuthByDateRangePayload, err error) {
 
 	endpoint := w.baseurl + "auth/getByDate"
 	bod, code, err := byDateRange(page, limit, from, to, endpoint, w.token)
@@ -251,7 +249,7 @@ func (w Client) AuthByDateRange(page, limit, from, to string) (body response.Aut
 }
 
 // AuthByBank fetches authentication info using the bank id.
-func (w Client) AuthByBank(page, limit, bankID string) (body response.AuthByBankPayload, err error) {
+func (w Client) AuthByBank(page, limit, bankID string) (body AuthByBankPayload, err error) {
 
 	pl := genPayload{
 		Page:   page,
@@ -274,7 +272,7 @@ func (w Client) AuthByBank(page, limit, bankID string) (body response.AuthByBank
 }
 
 // AuthByCustomerDate fetches authentication for a customer using a date range and customer id.
-func (w Client) AuthByCustomerDate(page, limit, from, to, customerID string) (body response.AuthByCustomerDateRangePayload, err error) {
+func (w Client) AuthByCustomerDate(page, limit, from, to, customerID string) (body AuthByCustomerDateRangePayload, err error) {
 
 	endpoint := w.baseurl + "auth/getByCustomerDate"
 	bod, code, err := byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
@@ -295,7 +293,7 @@ Balance Product, documentation can be found here https://docs.okra.ng/products/b
 */
 
 // RetrieveBalance retrieves Bank balance
-func (w Client) RetrieveBalance() (body response.RetrieveBalancePayload, err error) {
+func (w Client) RetrieveBalance() (body RetrieveBalancePayload, err error) {
 
 	endpoint := w.baseurl + "products/balances"
 
@@ -313,7 +311,7 @@ func (w Client) RetrieveBalance() (body response.RetrieveBalancePayload, err err
 }
 
 // BalanceByID fetches balance info using the id of the balance.
-func (w Client) BalanceByID(page, limit, ID string) (body response.BalanceByIDPayload, err error) {
+func (w Client) BalanceByID(page, limit, ID string) (body BalanceByIDPayload, err error) {
 
 	endpoint := w.baseurl + "balance/getById"
 	bod, code, err := byID(page, limit, ID, endpoint, w.token)
@@ -341,7 +339,7 @@ func (w Client) BalanceByOptions(page, limit, firstname, lastname string) (body 
 }
 
 // BalanceByCustomer fetches balance info using the customer id
-func (w Client) BalanceByCustomer(page, limit, customerID string) (body response.BalanceByCustomerIDPayload, err error) {
+func (w Client) BalanceByCustomer(page, limit, customerID string) (body BalanceByCustomerIDPayload, err error) {
 
 	endpoint := w.baseurl + "balance/getByCustomer"
 	bod, code, err := byCustomer(page, limit, customerID, endpoint, w.token)
@@ -358,7 +356,7 @@ func (w Client) BalanceByCustomer(page, limit, customerID string) (body response
 }
 
 // BalanceByAccount fetches balance info using the account id
-func (w Client) BalanceByAccount(page, limit, AccountID string) (body response.BalanceByAccountPayload, err error) {
+func (w Client) BalanceByAccount(page, limit, AccountID string) (body BalanceByAccountPayload, err error) {
 
 	pl := genPayload{
 		Page:      page,
@@ -399,7 +397,7 @@ func (w Client) BalanceByType(page, limit, theType, amount string) (body string,
 }
 
 // BalanceByCustomerDate fetches balance info of a customer using a date range and customer id.
-func (w Client) BalanceByCustomerDate(page, limit, from, to, customerID string) (body response.BalanceByCustomerDateRangePayload, err error) {
+func (w Client) BalanceByCustomerDate(page, limit, from, to, customerID string) (body BalanceByCustomerDateRangePayload, err error) {
 
 	endpoint := w.baseurl + "balance/getByCustomerDate"
 	bod, code, err := byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
@@ -416,7 +414,7 @@ func (w Client) BalanceByCustomerDate(page, limit, from, to, customerID string) 
 }
 
 // PeriodicBalance fetches real-time BALANCE at anytime without heavy calculation of the transactions on each of an Record's accounts.
-func (w Client) PeriodicBalance(currency, recordID, accountID string) (body response.PeriodicBalancePayload, err error) {
+func (w Client) PeriodicBalance(currency, recordID, accountID string) (body PeriodicBalancePayload, err error) {
 
 	pl := genPayload{
 		Currency: currency,
@@ -443,7 +441,7 @@ Transaction product, documentation can be found at https://docs.okra.ng/products
 */
 
 // RetrieveTransaction retrieves transactions
-func (w Client) RetrieveTransaction() (body response.RetrieveTransactionPayload, err error) {
+func (w Client) RetrieveTransaction() (body RetrieveTransactionPayload, err error) {
 
 	endpoint := w.baseurl + "products/transactions"
 	bod, code, err := postRequestByte(nil, endpoint, w.token)
@@ -482,7 +480,7 @@ func (w Client) TransactionByOptions(page, limit, firstname, lastname string) (b
 }
 
 // TransactionByCustomer fetches transaction info using the customer id
-func (w Client) TransactionByCustomer(page, limit, customerID string) (body response.TransactionByCustomerIDPayload, err error) {
+func (w Client) TransactionByCustomer(page, limit, customerID string) (body TransactionByCustomerIDPayload, err error) {
 
 	endpoint := w.baseurl + "transaction/getByCustomer"
 	bod, code, err := byCustomer(page, limit, customerID, endpoint, w.token)
@@ -516,7 +514,7 @@ func (w Client) TransactionByAccount(page, limit, AccountID string) (body string
 }
 
 // TransactionByDateRange fetches transaction info using a date range.
-func (w Client) TransactionByDateRange(page, limit, from, to string) (body response.TransactionByDateRangePayload, err error) {
+func (w Client) TransactionByDateRange(page, limit, from, to string) (body TransactionByDateRangePayload, err error) {
 
 	endpoint := w.baseurl + "transaction/getByDate"
 	bod, code, err := byDateRange(page, limit, from, to, endpoint, w.token)
@@ -533,7 +531,7 @@ func (w Client) TransactionByDateRange(page, limit, from, to string) (body respo
 }
 
 // TransactionByBank fetches transaction info using the bank id.
-func (w Client) TransactionByBank(page, limit, bankID string) (body response.TransactionByBankIDPayload, err error) {
+func (w Client) TransactionByBank(page, limit, bankID string) (body TransactionByBankIDPayload, err error) {
 
 	pl := genPayload{
 		Page:   page,
@@ -589,7 +587,7 @@ func (w Client) TransactionBySpendingPattern(customerID string) (body string, co
 }
 
 // TransactionByCustomerDate fetches transaction info of a customer using a date range and customer id.
-func (w Client) TransactionByCustomerDate(page, limit, from, to, customerID string) (body response.TransactionByCustomerDateRangePayload, err error) {
+func (w Client) TransactionByCustomerDate(page, limit, from, to, customerID string) (body TransactionByCustomerDateRangePayload, err error) {
 
 	endpoint := w.baseurl + "transaction/getByCustomerDate"
 	pl := genPayload{
@@ -678,7 +676,7 @@ func (w Client) IdentityByCustomer(page, limit, customerID string) (body string,
 }
 
 // IdentityByDateRange fetches various account holder information on file using date range.
-func (w Client) IdentityByDateRange(page, limit, from, to string) (body response.IdentityByCustomerDatePayload, err error) {
+func (w Client) IdentityByDateRange(page, limit, from, to string) (body IdentityByCustomerDatePayload, err error) {
 
 	endpoint := w.baseurl + "identity/getByDate"
 	bod, code, err := byDateRange(page, limit, from, to, endpoint, w.token)
@@ -695,7 +693,7 @@ func (w Client) IdentityByDateRange(page, limit, from, to string) (body response
 }
 
 // IdentityByCustomerDate fetches account holder information on file using date range and customer id.
-func (w Client) IdentityByCustomerDate(page, limit, from, to, customerID string) (body response.IdentityByCustomerDatePayload, err error) {
+func (w Client) IdentityByCustomerDate(page, limit, from, to, customerID string) (body IdentityByCustomerDatePayload, err error) {
 
 	endpoint := w.baseurl + "identity/getByCustomerDate"
 	bod, code, err := byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
@@ -749,7 +747,7 @@ func (w Client) IncomeByCustomer(page, limit, customerID string) (body string, c
 }
 
 // IncomeByCustomerDate retrieve information pertaining to a Record’s income using the customer id and date range.
-func (w Client) IncomeByCustomerDate(page, limit, from, to, customerID string) (body response.IncomeByCustomerDatePayload, err error) {
+func (w Client) IncomeByCustomerDate(page, limit, from, to, customerID string) (body IncomeByCustomerDatePayload, err error) {
 
 	endpoint := w.baseurl + "income/getByCustomerDate"
 	bod, code, err := byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
