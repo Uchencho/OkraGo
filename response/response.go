@@ -3,7 +3,7 @@ package response
 import "time"
 
 type RetrieveAuthPayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -31,7 +31,7 @@ type RetrieveAuthPayload struct {
 }
 
 type AuthByIDPayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -70,7 +70,7 @@ type AuthByIDPayload struct {
 }
 
 type AuthByCustomerIDPayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -109,7 +109,7 @@ type AuthByCustomerIDPayload struct {
 }
 
 type AuthByDateRangePayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -148,7 +148,7 @@ type AuthByDateRangePayload struct {
 }
 
 type AuthByCustomerDateRangePayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -187,7 +187,7 @@ type AuthByCustomerDateRangePayload struct {
 }
 
 type AuthByBankPayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -229,7 +229,7 @@ type AuthByBankPayload struct {
 // --------------
 
 type RetrieveBalancePayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -257,7 +257,7 @@ type RetrieveBalancePayload struct {
 }
 
 type BalanceByIDPayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -301,7 +301,7 @@ type BalanceByIDPayload struct {
 }
 
 type BalanceByCustomerIDPayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -345,7 +345,7 @@ type BalanceByCustomerIDPayload struct {
 }
 
 type BalanceByCustomerDateRangePayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -388,7 +388,7 @@ type BalanceByCustomerDateRangePayload struct {
 }
 
 type BalanceByAccountPayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -432,7 +432,7 @@ type BalanceByAccountPayload struct {
 }
 
 type PeriodicBalancePayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -444,7 +444,7 @@ type PeriodicBalancePayload struct {
 // ----------
 
 type RetrieveTransactionPayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -465,7 +465,7 @@ type RetrieveTransactionPayload struct {
 }
 
 type TransactionByCustomerIDPayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -527,7 +527,7 @@ type TransactionByCustomerIDPayload struct {
 }
 
 type TransactionByDateRangePayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -589,7 +589,7 @@ type TransactionByDateRangePayload struct {
 }
 
 type TransactionByCustomerDateRangePayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -654,7 +654,7 @@ type TransactionByCustomerDateRangePayload struct {
 // -------------------
 
 type IdentityByCustomerDatePayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {
@@ -677,7 +677,7 @@ type IdentityByCustomerDatePayload struct {
 // -------------------
 
 type IncomeByCustomerDatePayload struct {
-	StatusCode string `json:"statusCode"`
+	StatusCode int    `json:"statusCode"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
 	Data       struct {

@@ -95,17 +95,17 @@ func postRequest(pl interface{}, url, token string) (body string, err error) {
 	return
 }
 
-func postRequestByte(pl interface{}, url, token string) (body []byte, err error) {
+func postRequestByte(pl interface{}, url, token string) (body []byte, code int, err error) {
 
 	reqBody, err := json.Marshal(pl)
 	if err != nil {
-		return body, fmt.Errorf("error marshalling json: %w", err)
+		return body, 0, fmt.Errorf("error marshalling json: %w", err)
 	}
 
 	var bearer = "Bearer " + token
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
 	if err != nil {
-		return body, fmt.Errorf("error making http call: %w", err)
+		return body, 0, fmt.Errorf("error making http call: %w", err)
 	}
 	req.Header.Add("Authorization", bearer)
 	req.Header.Set("Content-Type", "application/json;charset=utf-8")
@@ -113,28 +113,22 @@ func postRequestByte(pl interface{}, url, token string) (body []byte, err error)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return body, fmt.Errorf("error doing request: %w", err)
+		return body, 0, fmt.Errorf("error doing request: %w", err)
 	}
+	code = resp.StatusCode
 
 	defer resp.Body.Close()
 
 	body, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return body, fmt.Errorf("error reading body: %w", err)
+		return body, code, fmt.Errorf("error reading body: %w", err)
 	}
-	if resp.StatusCode != 200 {
-		body = []byte(`{"statusCode":resp.StatusCode}`)
-	}
-	// else {
-	// 	// How to append this to the byte created above
-	// 	// body = []byte(`{"statusCode":"200"}`)
-	// }
 
 	return
 }
 
 // general unexported byid function since all 5 products have similar signature
-func byID(page, limit, i, endpoint, token string) (body []byte, err error) {
+func byID(page, limit, i, endpoint, token string) (body []byte, code int, err error) {
 
 	pl := genPayload{
 		Page:  page,
@@ -142,9 +136,9 @@ func byID(page, limit, i, endpoint, token string) (body []byte, err error) {
 		ID:    i,
 	}
 
-	body, err = postRequestByte(pl, endpoint, token)
+	body, code, err = postRequestByte(pl, endpoint, token)
 	if err != nil {
-		return body, fmt.Errorf("error fetching product using id: %w", err)
+		return body, code, fmt.Errorf("error fetching product using id: %w", err)
 	}
 	return
 }
@@ -167,7 +161,7 @@ func byOptions(page, limit, firstname, lastname, url, token string) (body string
 	return
 }
 
-func byCustomer(page, limit, customerID, endpoint, token string) (body []byte, err error) {
+func byCustomer(page, limit, customerID, endpoint, token string) (body []byte, code int, err error) {
 
 	pl := genPayload{
 		Page:       page,
@@ -175,14 +169,14 @@ func byCustomer(page, limit, customerID, endpoint, token string) (body []byte, e
 		CustomerID: customerID,
 	}
 
-	body, err = postRequestByte(pl, endpoint, token)
+	body, code, err = postRequestByte(pl, endpoint, token)
 	if err != nil {
-		return body, fmt.Errorf("error retrieving product bycustomer: %w", err)
+		return body, code, fmt.Errorf("error retrieving product bycustomer: %w", err)
 	}
 	return
 }
 
-func byDateRange(page, limit, from, to, endpoint, token string) (body []byte, err error) {
+func byDateRange(page, limit, from, to, endpoint, token string) (body []byte, code int, err error) {
 
 	pl := genPayload{
 		Page:  page,
@@ -190,14 +184,14 @@ func byDateRange(page, limit, from, to, endpoint, token string) (body []byte, er
 		From:  from,
 		To:    to,
 	}
-	body, err = postRequestByte(pl, endpoint, token)
+	body, code, err = postRequestByte(pl, endpoint, token)
 	if err != nil {
-		return body, fmt.Errorf("error retrieving product byDateRange: %w", err)
+		return body, code, fmt.Errorf("error retrieving product byDateRange: %w", err)
 	}
 	return
 }
 
-func byCustomerDate(page, limit, from, to, customerID, endpoint, token string) (body []byte, err error) {
+func byCustomerDate(page, limit, from, to, customerID, endpoint, token string) (body []byte, code int, err error) {
 
 	pl := genPayload{
 		Page:       page,
@@ -206,9 +200,9 @@ func byCustomerDate(page, limit, from, to, customerID, endpoint, token string) (
 		To:         to,
 		CustomerID: customerID,
 	}
-	body, err = postRequestByte(pl, endpoint, token)
+	body, code, err = postRequestByte(pl, endpoint, token)
 	if err != nil {
-		return body, fmt.Errorf("error retrieving product byCustomerDate: %w", err)
+		return body, code, fmt.Errorf("error retrieving product byCustomerDate: %w", err)
 	}
 	return
 }
@@ -217,11 +211,13 @@ func byCustomerDate(page, limit, from, to, customerID, endpoint, token string) (
 func (w Client) RetrieveAuth() (body response.RetrieveAuthPayload, err error) {
 
 	endpoint := w.baseurl + "products/auths"
-	bod, err := postRequestByte(nil, endpoint, w.token)
+	bod, code, err := postRequestByte(nil, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving auth token: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -233,11 +229,13 @@ func (w Client) RetrieveAuth() (body response.RetrieveAuthPayload, err error) {
 func (w Client) AuthByID(page, limit, ID string) (body response.AuthByIDPayload, err error) {
 
 	endpoint := w.baseurl + "auth/getById"
-	bod, err := byID(page, limit, ID, endpoint, w.token)
+	bod, code, err := byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error fetching auth using id: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -259,11 +257,13 @@ func (w Client) AuthByOptions(page, limit, firstname, lastname string) (body str
 func (w Client) AuthByCustomer(page, limit, customerID string) (body response.AuthByCustomerIDPayload, err error) {
 
 	endpoint := w.baseurl + "auth/getByCustomer"
-	bod, err := byCustomer(page, limit, customerID, endpoint, w.token)
+	bod, code, err := byCustomer(page, limit, customerID, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving auth bycustomer: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -274,11 +274,13 @@ func (w Client) AuthByCustomer(page, limit, customerID string) (body response.Au
 func (w Client) AuthByDateRange(page, limit, from, to string) (body response.AuthByDateRangePayload, err error) {
 
 	endpoint := w.baseurl + "auth/getByDate"
-	bod, err := byDateRange(page, limit, from, to, endpoint, w.token)
+	bod, code, err := byDateRange(page, limit, from, to, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving auth byDateRange: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -295,11 +297,13 @@ func (w Client) AuthByBank(page, limit, bankID string) (body response.AuthByBank
 	}
 
 	endpoint := w.baseurl + "auth/getByBank"
-	bod, err := postRequestByte(pl, endpoint, w.token)
+	bod, code, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving auth byBank: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -310,11 +314,13 @@ func (w Client) AuthByBank(page, limit, bankID string) (body response.AuthByBank
 func (w Client) AuthByCustomerDate(page, limit, from, to, customerID string) (body response.AuthByCustomerDateRangePayload, err error) {
 
 	endpoint := w.baseurl + "auth/getByCustomerDate"
-	bod, err := byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
+	bod, code, err := byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving auth byCustomerDate: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -330,11 +336,13 @@ func (w Client) RetrieveBalance() (body response.RetrieveBalancePayload, err err
 
 	endpoint := w.baseurl + "products/balances"
 
-	bod, err := postRequestByte(nil, endpoint, w.token)
+	bod, code, err := postRequestByte(nil, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving bank balance: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -345,11 +353,13 @@ func (w Client) RetrieveBalance() (body response.RetrieveBalancePayload, err err
 func (w Client) BalanceByID(page, limit, ID string) (body response.BalanceByIDPayload, err error) {
 
 	endpoint := w.baseurl + "balance/getById"
-	bod, err := byID(page, limit, ID, endpoint, w.token)
+	bod, code, err := byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error fetching balance using id: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -371,11 +381,13 @@ func (w Client) BalanceByOptions(page, limit, firstname, lastname string) (body 
 func (w Client) BalanceByCustomer(page, limit, customerID string) (body response.BalanceByCustomerIDPayload, err error) {
 
 	endpoint := w.baseurl + "balance/getByCustomer"
-	bod, err := byCustomer(page, limit, customerID, endpoint, w.token)
+	bod, code, err := byCustomer(page, limit, customerID, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving balance bycustomer: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -392,11 +404,13 @@ func (w Client) BalanceByAccount(page, limit, AccountID string) (body response.B
 	}
 
 	endpoint := w.baseurl + "balance/getByAccount"
-	bod, err := postRequestByte(pl, endpoint, w.token)
+	bod, code, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving balance by accountID: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -425,11 +439,13 @@ func (w Client) BalanceByType(page, limit, theType, amount string) (body string,
 func (w Client) BalanceByCustomerDate(page, limit, from, to, customerID string) (body response.BalanceByCustomerDateRangePayload, err error) {
 
 	endpoint := w.baseurl + "balance/getByCustomerDate"
-	bod, err := byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
+	bod, code, err := byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving balance byCustomerDate: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -446,11 +462,13 @@ func (w Client) PeriodicBalance(currency, recordID, accountID string) (body resp
 	}
 
 	endpoint := w.baseurl + "products/balance/periodic"
-	bod, err := postRequestByte(pl, endpoint, w.token)
+	bod, code, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving real time balance: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -465,7 +483,7 @@ Transaction product, documentation can be found at https://docs.okra.ng/products
 func (w Client) RetrieveTransaction() (body response.RetrieveTransactionPayload, err error) {
 
 	endpoint := w.baseurl + "products/transactions"
-	bod, err := postRequestByte(nil, endpoint, w.token)
+	bod, code, err := postRequestByte(nil, endpoint, w.token)
 	if err != nil {
 		return body, fmt.Errorf("error retrieving bank balance: %w", err)
 	}
@@ -473,17 +491,18 @@ func (w Client) RetrieveTransaction() (body response.RetrieveTransactionPayload,
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
+	body.StatusCode = code
 	return
 }
 
 // TransactionByID fetches transaction info using the id of the transaction.
-func (w Client) TransactionByID(page, limit, ID string) (body string, err error) {
+func (w Client) TransactionByID(page, limit, ID string) (body string, code int, err error) {
 
 	endpoint := w.baseurl + "transaction/getById"
-	bod, err := byID(page, limit, ID, endpoint, w.token)
+	bod, code, err := byID(page, limit, ID, endpoint, w.token)
 	body = string(bod)
 	if err != nil {
-		return "Error", fmt.Errorf("error fetching Transaction using id: %w", err)
+		return "Error", code, fmt.Errorf("error fetching Transaction using id: %w", err)
 	}
 	return
 }
@@ -503,11 +522,13 @@ func (w Client) TransactionByOptions(page, limit, firstname, lastname string) (b
 func (w Client) TransactionByCustomer(page, limit, customerID string) (body response.TransactionByCustomerIDPayload, err error) {
 
 	endpoint := w.baseurl + "transaction/getByCustomer"
-	bod, err := byCustomer(page, limit, customerID, endpoint, w.token)
+	bod, code, err := byCustomer(page, limit, customerID, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving balance bycustomer: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -535,11 +556,13 @@ func (w Client) TransactionByAccount(page, limit, AccountID string) (body string
 func (w Client) TransactionByDateRange(page, limit, from, to string) (body response.TransactionByDateRangePayload, err error) {
 
 	endpoint := w.baseurl + "transaction/getByDate"
-	bod, err := byDateRange(page, limit, from, to, endpoint, w.token)
+	bod, code, err := byDateRange(page, limit, from, to, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving transaction byDateRange: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -607,11 +630,13 @@ func (w Client) TransactionByCustomerDate(page, limit, from, to, customerID stri
 		To:       to,
 		Customer: customerID,
 	}
-	bod, err := postRequestByte(pl, endpoint, w.token)
+	bod, code, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving Transaction byCustomerDate: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -651,14 +676,14 @@ func (w Client) RetrieveIdentities() (body string, err error) {
 }
 
 // IdentityByID fetches various account holder information on file using the id
-func (w Client) IdentityByID(page, limit, ID string) (body string, err error) {
+func (w Client) IdentityByID(page, limit, ID string) (body string, code int, err error) {
 
 	endpoint := w.baseurl + "identity/getById"
-	bod, err := byID(page, limit, ID, endpoint, w.token)
+	bod, code, err := byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error fetching identity using id: %w", err)
+		return "Error", code, fmt.Errorf("error fetching identity using id: %w", err)
 	}
-	return string(bod), err
+	return string(bod), code, err
 }
 
 // IdentityByOptions fetches identity info using the options metadata you provided when setting up the widget.
@@ -673,25 +698,27 @@ func (w Client) IdentityByOptions(page, limit, firstname, lastname string) (body
 }
 
 // IdentityByCustomer retrieve various account holder information on file using the customer id.
-func (w Client) IdentityByCustomer(page, limit, customerID string) (body string, err error) {
+func (w Client) IdentityByCustomer(page, limit, customerID string) (body string, code int, err error) {
 
 	endpoint := w.baseurl + "identity/getByCustomer"
-	bod, err := byCustomer(page, limit, customerID, endpoint, w.token)
+	bod, code, err := byCustomer(page, limit, customerID, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving identity bycustomer: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving identity bycustomer: %w", err)
 	}
-	return string(bod), err
+	return string(bod), code, err
 }
 
 // IdentityByDateRange fetches various account holder information on file using date range.
 func (w Client) IdentityByDateRange(page, limit, from, to string) (body response.IdentityByCustomerDatePayload, err error) {
 
 	endpoint := w.baseurl + "identity/getByDate"
-	bod, err := byDateRange(page, limit, from, to, endpoint, w.token)
+	bod, code, err := byDateRange(page, limit, from, to, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving identity byDateRange: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -702,11 +729,13 @@ func (w Client) IdentityByDateRange(page, limit, from, to string) (body response
 func (w Client) IdentityByCustomerDate(page, limit, from, to, customerID string) (body response.IdentityByCustomerDatePayload, err error) {
 
 	endpoint := w.baseurl + "identity/getByCustomerDate"
-	bod, err := byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
+	bod, code, err := byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving identity byCustomerDate: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}
@@ -729,36 +758,38 @@ func (w Client) RetrieveIncome() (body string, err error) {
 }
 
 // IncomeByID retrieve information pertaining to a Record’s income using the id.
-func (w Client) IncomeByID(page, limit, ID string) (body string, err error) {
+func (w Client) IncomeByID(page, limit, ID string) (body string, code int, err error) {
 
 	endpoint := w.baseurl + "income/getById"
-	bod, err := byID(page, limit, ID, endpoint, w.token)
+	bod, code, err := byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error fetching income using id: %w", err)
+		return "Error", code, fmt.Errorf("error fetching income using id: %w", err)
 	}
-	return string(bod), err
+	return string(bod), code, err
 }
 
 // IncomeByCustomer retrieve information pertaining to a Record’s income using the customer id.
-func (w Client) IncomeByCustomer(page, limit, customerID string) (body string, err error) {
+func (w Client) IncomeByCustomer(page, limit, customerID string) (body string, code int, err error) {
 
 	endpoint := w.baseurl + "income/getByCustomer"
-	bod, err := byCustomer(page, limit, customerID, endpoint, w.token)
+	bod, code, err := byCustomer(page, limit, customerID, endpoint, w.token)
 	if err != nil {
-		return "Error", fmt.Errorf("error retrieving income bycustomer: %w", err)
+		return "Error", code, fmt.Errorf("error retrieving income bycustomer: %w", err)
 	}
-	return string(bod), err
+	return string(bod), code, err
 }
 
 // IncomeByCustomerDate retrieve information pertaining to a Record’s income using the customer id and date range.
 func (w Client) IncomeByCustomerDate(page, limit, from, to, customerID string) (body response.IncomeByCustomerDatePayload, err error) {
 
 	endpoint := w.baseurl + "income/getByCustomerDate"
-	bod, err := byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
+	bod, code, err := byCustomerDate(page, limit, from, to, customerID, endpoint, w.token)
 	if err != nil {
+		body.StatusCode = code
 		return body, fmt.Errorf("error retrieving income byCustomerDate: %w", err)
 	}
 	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
 	if err != nil {
 		return body, fmt.Errorf("error Unmarshalling json: %w", err)
 	}

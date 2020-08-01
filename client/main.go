@@ -16,8 +16,8 @@ func main() {
 	)
 	okraClient := okra.New(token, "https://api.okra.ng/sandbox/v1/")
 
-	// body2, err2 := okraClient.RetrieveAuth()
-	// fmt.Println(err2, "\n\n", body2.Data.Auths)
+	body2, err2 := okraClient.RetrieveAuth()
+	fmt.Println(err2, "\n\n", body2.Data.Auths, body2.StatusCode)
 
 	// body, err := okraClient.AuthByBank("1", "20", bankID)
 	// fmt.Println(err, "\n\n", body.Message, body.Data.Auths)
@@ -31,8 +31,8 @@ func main() {
 	// body3, err := okraClient.PeriodicBalance("NGN", "5f231df19f28af16b6cf5994", "5f231e0c9e5c6e823adf606f")
 	// fmt.Println(err, "\n\n", body3)
 
-	body3, err := okraClient.BalanceByOptions("1", "20", "James", "Galler")
-	fmt.Println(err, "\n\n", body3)
+	// body3, err := okraClient.BalanceByOptions("1", "20", "James", "Galler")
+	// fmt.Println(err, "\n\n", body3)
 
 	// body, err := okraClient.RetrieveTransaction()
 	// fmt.Println(err, body.Data, body.Message)
