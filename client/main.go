@@ -13,10 +13,10 @@ func main() {
 
 	token := os.Getenv("OKRA_TOKEN")
 	// cID := "5e9d5dd3471ff50f735ad68a"
-	const (
-		bankID = "5d6fe57a4099cc4b210bbeae"
-		bID    = "5d6fe57a4099cc4b210bbeb1"
-	)
+	// const (
+	// 	bankID = "5d6fe57a4099cc4b210bbeae"
+	// 	bID    = "5d6fe57a4099cc4b210bbeb1"
+	// )
 	okraClient := okra.New(token, "https://api.okra.ng/sandbox/v1/")
 
 	body2, err2 := okraClient.RetrieveTransaction()
