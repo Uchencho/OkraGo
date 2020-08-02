@@ -1,28 +1,26 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
 
-// import (
-// 	"fmt"
-// 	"os"
-
-// 	okra "github.com/Uchencho/OkraGo"
-// )
+	okra "github.com/Uchencho/OkraGo"
+)
 
 func main() {
 
 	fmt.Println("Please work")
 
-	// token := os.Getenv("OKRA_TOKEN")
+	token := os.Getenv("OKRA_TOKEN")
 	// cID := "5e9d5dd3471ff50f735ad68a"
-	// const (
-	// 	bankID = "5d6fe57a4099cc4b210bbeae"
-	// bID = "5d6fe57a4099cc4b210bbeb1"
-	// )
-	// okraClient := okra.New(token, "https://api.okra.ng/sandbox/v1/")
+	const (
+		bankID = "5d6fe57a4099cc4b210bbeae"
+		bID    = "5d6fe57a4099cc4b210bbeb1"
+	)
+	okraClient := okra.New(token, "https://api.okra.ng/sandbox/v1/")
 
-	// body2, err2 := okraClient.RetrieveTransaction()
-	// fmt.Println(err2, "\n\n", body2.Data, body2.StatusCode)
+	body2, err2 := okraClient.RetrieveTransaction()
+	fmt.Println(err2, "\n\n", body2.Data, body2.StatusCode)
 
 	// body, err := okraClient.AuthByBank("1", "20", bankID)
 	// fmt.Println(err, "\n\n", body.Message, body.Data.Auths)
