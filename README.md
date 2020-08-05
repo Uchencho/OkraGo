@@ -11,7 +11,7 @@ Okra API wrapper in Go
 go get github.com/Uchencho/OkraGo
 ```
 
-### Paystack
+### OKRA
 
 ```go
 package main
