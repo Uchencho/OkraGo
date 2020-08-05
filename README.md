@@ -1,5 +1,5 @@
 # OkraGo
-Okra API wrapper in Go
+[Okra](https://okra.ng/) API wrapper in Go
 
 <img src="https://pbs.twimg.com/profile_images/1199677745262989314/_D2jAMbu_400x400.jpg" alt="drawing" width="200"/> 
 
@@ -11,7 +11,12 @@ Okra API wrapper in Go
 go get github.com/Uchencho/OkraGo
 ```
 
-### OKRA
+Documentation
+-------------
+Please see https://docs.okra.ng/ for the most up-to-date documentation for the OKRA API.
+
+
+#### OKRA
 
 ```go
 package main
