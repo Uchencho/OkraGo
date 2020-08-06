@@ -15,7 +15,10 @@ func main() {
 	// 	bankID = "5d6fe57a4099cc4b210bbeae"
 	// 	bID    = "5d6fe57a4099cc4b210bbeb1"
 	// )
-	okraClient := okra.New(token, "https://api.okra.ng/sandbox/v1/")
+	okraClient, err := okra.New(token, "https://api.okra.ng/sandbox/v1/")
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	body2, err2 := okraClient.RetrieveAuth()
 	fmt.Println(err2, body2.StatusCode)
