@@ -3,6 +3,7 @@ package okra
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -43,17 +44,18 @@ type genPayload struct {
 }
 
 // New returns a struct that can be used to call all methods. Panics if empty arguements are used.
-func New(t, b string) Client {
+func New(t, b string) (Client, error) {
 	u := Client{
 		token:   t,
 		baseurl: b,
 	}
+	var err error
 	if u.token == "" || u.baseurl == "" {
-		panic("Token and Base url is needed to call this Function")
+		err = errors.New("Token and Base url is needed to call this Function")
 	} else if string(u.baseurl[len(u.baseurl)-1]) != "/" {
 		u.baseurl = u.baseurl + "/"
 	}
-	return u
+	return u, err
 }
 
 func postRequestByte(pl interface{}, url, token string) (body []byte, code int, err error) {
