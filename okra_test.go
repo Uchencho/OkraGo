@@ -7,6 +7,11 @@ import (
 	okra "github.com/Uchencho/OkraGo"
 )
 
+// type mockingCalls interface {
+// 	// https://blog.learngoprogramming.com/how-to-mock-in-your-go-golang-tests-b9eee7d7c266
+// 	RetrieveAuth() okra.RetrieveAuthPayload
+// }
+
 const (
 	baseurl = "https://api.okra.ng/sandbox/v1"
 

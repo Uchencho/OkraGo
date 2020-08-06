@@ -9,8 +9,6 @@ import (
 
 func main() {
 
-	fmt.Println("Please work")
-
 	token := os.Getenv("OKRA_TOKEN")
 	// cID := "5e9d5dd3471ff50f735ad68a"
 	// const (
@@ -19,8 +17,8 @@ func main() {
 	// )
 	okraClient := okra.New(token, "https://api.okra.ng/sandbox/v1/")
 
-	body2, err2 := okraClient.RetrieveTransaction()
-	fmt.Println(err2, "\n\n", body2.Data, body2.StatusCode)
+	body2, err2 := okraClient.RetrieveAuth()
+	fmt.Println(err2, body2.StatusCode)
 
 	// body, err := okraClient.AuthByBank("1", "20", bankID)
 	// fmt.Println(err, "\n\n", body.Message, body.Data.Auths)
@@ -40,8 +38,8 @@ func main() {
 	// body3, err := okraClient.BalanceByOptions("1", "20", "James", "Galler")
 	// fmt.Println(err, "\n\n", body3)
 
-	// body, code, err := okraClient.RetrieveIncome()
-	// fmt.Println(err, body, code)
+	body, code, err := okraClient.RetrieveIncome()
+	fmt.Println("\n\n", err, body, code)
 
 	// body2, err2 := okraClient.RetrieveTransaction()
 	// fmt.Println(err2, body2.Data, body2.Message)
@@ -58,3 +56,13 @@ func main() {
 // Balance by type currently returns a 400 Bad request
 // TransactionBySpendingPattern returns 400 bad request
 // Retrieve Identities returning 504
+
+/*
+Struct Responses
+
+
+Auth : 7, Done 6, remaining 1
+Balance : 8, Done 6, remaining 2
+Transaction : 11, Done 5, remaining 6
+Identity and Income is currently unstable so returning string
+*/
