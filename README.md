@@ -53,7 +53,7 @@ func main () {
     */
 }
 ```
-GIF coming soon...
+Use Product Name to Access Underlying Resources... ![](https://github.com/Uchencho/OkraGo/blob/master/client/okra.gif) 
 
 >**NOTE**<br/>
 >Check the `client` directory to see a sample implementation
