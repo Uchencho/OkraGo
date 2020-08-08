@@ -634,25 +634,37 @@ Identity product, documentation can be found at https://docs.okra.ng/products/id
 */
 
 // RetrieveIdentities retrieves various account holder information on file
-func (w Client) RetrieveIdentities() (body string, cod int, err error) {
+func (w Client) RetrieveIdentities() (body RetrieveIdentitiesPayload, err error) {
 
 	endpoint := w.baseurl + "products/identities"
 	bod, code, err := postRequestByte(nil, endpoint, w.token)
 	if err != nil {
-		return "Error", code, fmt.Errorf("error retrieving account information: %w", err)
+		body.StatusCode = code
+		return body, fmt.Errorf("error retrieving account information: %w", err)
 	}
-	return string(bod), code, err
+	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
+	}
+	return
 }
 
 // IdentityByID fetches various account holder information on file using the id
-func (w Client) IdentityByID(page, limit, ID string) (body string, code int, err error) {
+func (w Client) IdentityByID(page, limit, ID string) (body IdentityByCustomerPayload, err error) {
 
 	endpoint := w.baseurl + "identity/getById"
 	bod, code, err := byID(page, limit, ID, endpoint, w.token)
 	if err != nil {
-		return "Error", code, fmt.Errorf("error fetching identity using id: %w", err)
+		body.StatusCode = code
+		return body, fmt.Errorf("error fetching identity using id: %w", err)
 	}
-	return string(bod), code, err
+	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
+	}
+	return
 }
 
 // IdentityByOptions fetches identity info using the options metadata you provided when setting up the widget.
@@ -667,14 +679,20 @@ func (w Client) IdentityByOptions(page, limit, firstname, lastname string) (body
 }
 
 // IdentityByCustomer retrieve various account holder information on file using the customer id.
-func (w Client) IdentityByCustomer(page, limit, customerID string) (body string, code int, err error) {
+func (w Client) IdentityByCustomer(page, limit, customerID string) (body IdentityByCustomerPayload, err error) {
 
 	endpoint := w.baseurl + "identity/getByCustomer"
 	bod, code, err := byCustomer(page, limit, customerID, endpoint, w.token)
 	if err != nil {
-		return "Error", code, fmt.Errorf("error retrieving identity bycustomer: %w", err)
+		body.StatusCode = code
+		return body, fmt.Errorf("error retrieving identity bycustomer: %w", err)
 	}
-	return string(bod), code, err
+	err = json.Unmarshal(bod, &body)
+	body.StatusCode = code
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
+	}
+	return
 }
 
 // IdentityByDateRange fetches various account holder information on file using date range.
@@ -766,7 +784,7 @@ func (w Client) IncomeByCustomerDate(page, limit, from, to, customerID string) (
 }
 
 // ProcessIncome retrieves the income of particular customer using the customer's id.
-func (w Client) ProcessIncome(customerID string) (body string, code int, err error) {
+func (w Client) ProcessIncome(customerID string) (body ProcessIncomePayload, err error) {
 
 	pl := genPayload{
 		CustomerID: customerID,
@@ -775,7 +793,12 @@ func (w Client) ProcessIncome(customerID string) (body string, code int, err err
 	endpoint := w.baseurl + "products/income/process"
 	bod, code, err := postRequestByte(pl, endpoint, w.token)
 	if err != nil {
-		return "Error", code, fmt.Errorf("error processing income of a particular customer: %w", err)
+		body.StatusCode = code
+		return body, fmt.Errorf("error processing income of a particular customer: %w", err)
 	}
-	return string(bod), code, err
+	err = json.Unmarshal(bod, &body)
+	if err != nil {
+		return body, fmt.Errorf("error Unmarshalling json: %w", err)
+	}
+	return
 }

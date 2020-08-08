@@ -41,9 +41,6 @@ func main() {
 	// body3, err := okraClient.BalanceByOptions("1", "20", "James", "Galler")
 	// fmt.Println(err, "\n\n", body3)
 
-	body, code, err := okraClient.RetrieveIncome()
-	fmt.Println("\n\n", err, body, code)
-
 	// body2, err2 := okraClient.RetrieveTransaction()
 	// fmt.Println(err2, body2.Data, body2.Message)
 
@@ -54,18 +51,3 @@ func main() {
 	// fmt.Println(err, body)
 
 }
-
-// {"status":"success","message":"There are no incomes available for this client","data":{"pagination":{},"incomes":[]}}
-// Balance by type currently returns a 400 Bad request
-// TransactionBySpendingPattern returns 400 bad request
-// Retrieve Identities returning 504
-
-/*
-Struct Responses
-
-
-Auth : 7, Done 6, remaining 1
-Balance : 8, Done 6, remaining 2
-Transaction : 11, Done 5, remaining 6
-Identity and Income is currently unstable so returning string
-*/
