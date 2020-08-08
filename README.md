@@ -37,14 +37,18 @@ const sandboxUrl = "https://api.okra.ng/sandbox/v1/"
 ```go
 
 func main () {
-    okraClient := okra.New(token, sandboxUrl)
+    okraClient, err := okra.New(token, sandboxUrl)
     
-    //okraClient panics if token or sandboxUrl is empty
+    if err != nil {
+    	fmt.Println(err)
+    }
     
-    body, err := okraClient.RetrieveTransaction()
+    //okraClient returns an error if token or sandboxUrl is empty
+    
+    body, err2 := okraClient.RetrieveTransaction()
     	
     if err != nil {
-        log.Println(err)
+        log.Println(err2)
     }
     fmt.Println(body.Data,"\n\n", body.StatusCode)
     
