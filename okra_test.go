@@ -7,30 +7,6 @@ import (
 	okra "github.com/Uchencho/OkraGo"
 )
 
-// type mockingCalls interface {
-// 	// https://blog.learngoprogramming.com/how-to-mock-in-your-go-golang-tests-b9eee7d7c266
-// 	mockRetrieveAuth() okra.RetrieveAuthPayload
-// }
-
-type mockOkraClient struct {
-	token   string
-	baseurl string
-}
-
-func newMock() (mockOkraClient, error) {
-	return mockOkraClient{
-		token:   "okra_token",
-		baseurl: "sandbox",
-	}, nil
-}
-
-func (w mockOkraClient) mockRetrieveAuth() (body okra.RetrieveAuthPayload, err error) {
-
-	body.StatusCode = 200
-	body.Status = "Retrieve Auth Successful"
-	return body, nil
-}
-
 const (
 	baseurl = "https://api.okra.ng/sandbox/v1"
 
@@ -52,10 +28,9 @@ func TestInitializeOkra(t *testing.T) {
 }
 
 func TestRetrieveAuth(t *testing.T) {
-	// okraClient, err2 := okra.New(token, baseurl)
-	okraClient, err2 := newMock()
+	okraClient, err2 := okra.New(token, baseurl)
 	if err2 != nil {
-		body, err := okraClient.mockRetrieveAuth()
+		body, err := okraClient.RetrieveAuth()
 		if err != nil || body.StatusCode != 200 {
 			t.Fatalf("\t%s\tTest RetrieveAuth:\tGot Error: %v, and statuscode is : %v, Expected %v", failed, err, body.StatusCode, nil)
 		}
@@ -72,3 +47,5 @@ func TestTransactionByCustomerID(t *testing.T) {
 	}
 	t.Logf("\t%s\tTest TransactionByCustomer:\tShould have returned no errors.", succeed)
 }
+
+// To Do: Use mock tests
