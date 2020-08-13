@@ -47,3 +47,5 @@ func TestTransactionByCustomerID(t *testing.T) {
 	}
 	t.Logf("\t%s\tTest TransactionByCustomer:\tShould have returned no errors.", succeed)
 }
+
+// To Do: Use mock tests
