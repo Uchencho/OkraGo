@@ -61,7 +61,3 @@ Use Product Name to Access Underlying Resources... ![](https://github.com/Uchenc
 
 >**NOTE**<br/>
 >Check the `client` directory to see a sample implementation
-
-## Contributors
-
-* Nils Wogatzky - [GitHub](https://github.com/Oppodelldog)
